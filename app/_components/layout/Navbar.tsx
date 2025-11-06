@@ -59,7 +59,7 @@ export function Navbar() {
           {/* GitHub 链接（可选） */}
           <Button variant="outline" size="sm" asChild>
             <a
-              href="https://github.com/yourusername/neuroncanvas"
+              href="https://github.com/liuxiang09/neuroncanvas"
               target="_blank"
               rel="noopener noreferrer"
             >

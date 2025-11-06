@@ -19,8 +19,8 @@ export default function GalleryPage() {
       <div className="mb-12 space-y-4">
         <h1 className="text-4xl font-bold tracking-tight">模型画廊</h1>
         <p className="text-xl text-muted-foreground max-w-3xl">
-          探索深度学习历史上的里程碑模型。每个模型都配有交互式动画，
-          帮助你理解从数据输入到最终预测的完整流程。
+          探索深度学习历史上的里程碑模型。通过交互式可视化图形，
+          深入理解每个模型的架构设计、数据处理、训练技巧和关键创新点。
         </p>
       </div>
 
@@ -76,12 +76,24 @@ export default function GalleryPage() {
       </div>
 
       {/* 页面底部提示 */}
-      <div className="mt-12 rounded-lg border bg-muted/30 p-6 text-center">
+      <div className="mt-12 rounded-lg border bg-muted/30 p-6 text-center space-y-2">
+        <p className="text-sm font-medium text-foreground">
+          ✅ 已实现：LeNet-5、AlexNet
+        </p>
         <p className="text-sm text-muted-foreground">
-          更多经典模型正在开发中...
-          <Link href="https://github.com/yourusername/neuroncanvas" className="ml-1 text-primary hover:underline">
-            欢迎贡献
-          </Link>
+          🚧 开发中：VGG、ResNet、GoogLeNet、MobileNet 等
+        </p>
+        <p className="text-sm text-muted-foreground">
+          欢迎在
+          <a 
+            href="https://github.com/liuxiang09/NeuronCanvas" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-1 text-primary hover:underline font-medium"
+          >
+            GitHub
+          </a>
+          上关注项目进展或提出建议
         </p>
       </div>
     </div>

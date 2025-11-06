@@ -59,7 +59,7 @@ export function Footer() {
             <h3 className="font-semibold text-sm">联系我们</h3>
             <div className="flex space-x-4">
               <a
-                href="https://github.com/yourusername/neuroncanvas"
+                href="https://github.com/liuxiang09/neuroncanvas"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
@@ -77,7 +77,7 @@ export function Footer() {
                 <Twitter className="h-5 w-5" />
               </a>
               <a
-                href="mailto:contact@neuroncanvas.dev"
+                href="mailto:liuxiang09192021@163.com"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Email"
               >
