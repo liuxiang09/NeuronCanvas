@@ -1,38 +1,39 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Navbar } from "./_components/layout/Navbar";
-import { Footer } from "./_components/layout/Footer";
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { Header } from "@/components/layout/Header"
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
-  title: "NeuronCanvas - Sculpting Neural Networks in Your Browser",
-  description: "An interactive web platform for visualizing and understanding deep learning models through animations and sandbox tools.",
-  keywords: ["deep learning", "neural networks", "visualization", "AI", "machine learning", "education"],
-};
+  title: "NeuronCanvas - 可视化深度学习架构",
+  description: "一个开源的深度学习教育平台,以视觉化方式阐释经典神经网络架构",
+  keywords: ["深度学习", "神经网络", "可视化", "教育", "React", "Next.js"],
+  authors: [{ name: "NeuronCanvas Team" }],
+  openGraph: {
+    title: "NeuronCanvas - 可视化深度学习架构",
+    description: "一个开源的深度学习教育平台",
+    type: "website",
+  },
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="zh-CN">
-      <body className={inter.className}>
-        <div className="flex flex-col min-h-screen">
-          {/* 导航栏 */}
-          <Navbar />
-          
-          {/* 主内容区域 */}
-          <main className="flex-1">
-            {children}
-          </main>
-          
-          {/* 页脚 */}
-          <Footer />
+    <html lang="zh-CN" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased`}>
+        <div className="relative flex min-h-screen flex-col bg-background">
+          <Header />
+          {children}
         </div>
       </body>
     </html>
-  );
+  )
 }

@@ -1,0 +1,648 @@
+{
+  "metadata": {
+    "name": "googlenet",
+    "displayName": "GoogLeNet (Inception v1)",
+    "description": "GoogLeNet 是 Google 团队在 2014 年提出的深度卷积神经网络，引入了创新的 Inception 模块。该模块通过并行使用不同尺寸的卷积核来捕获多尺度特征，同时使用 1×1 卷积降低计算复杂度。GoogLeNet 在 ImageNet 竞赛中取得了优异成绩，证明了网络深度和宽度同等重要。",
+    "year": 2014,
+    "authors": [
+      "Christian Szegedy",
+      "Wei Liu",
+      "Yangqing Jia",
+      "Pierre Sermanet"
+    ],
+    "paper": "https://arxiv.org/abs/1409.4842",
+    "paperTitle": "Going deeper with convolutions",
+    "citations": 69967,
+    "tags": ["CNN", "Inception", "图像分类", "多尺度", "ImageNet"],
+    "category": "CNN"
+  },
+  "layers": [
+    {
+      "id": "input",
+      "name": "输入层",
+      "type": "input",
+      "description": "接收224x224像素的RGB彩色图像。",
+      "shape": [224, 224, 3]
+    },
+    {
+      "id": "stem_network",
+      "name": "主干网络",
+      "type": "stem",
+      "description": "网络的主干部分，由一系列传统的卷积和池化层组成，用于在进入Inception模块前，快速降低图像的空间分辨率并提取基础特征。",
+      "outputShape": [28, 28, 192],
+      "steps": [
+        {
+          "id": "conv1",
+          "name": "Conv1",
+          "type": "conv2d",
+          "filters": 64,
+          "kernelSize": [7, 7],
+          "stride": [2, 2],
+          "padding": [3, 3],
+          "activation": "relu",
+          "outputShape": [112, 112, 64]
+        },
+        {
+          "id": "pool1",
+          "name": "MaxPool1",
+          "type": "maxpool2d",
+          "poolSize": [3, 3],
+          "stride": [2, 2],
+          "padding": [1, 1],
+          "outputShape": [56, 56, 64]
+        },
+        {
+          "id": "conv2",
+          "name": "Conv2",
+          "type": "conv2d",
+          "filters": 192,
+          "kernelSize": [3, 3],
+          "stride": [1, 1],
+          "padding": [1, 1],
+          "activation": "relu",
+          "outputShape": [56, 56, 192]
+        },
+        {
+          "id": "pool2",
+          "name": "MaxPool2",
+          "type": "maxpool2d",
+          "poolSize": [3, 3],
+          "stride": [2, 2],
+          "padding": [1, 1],
+          "outputShape": [28, 28, 192]
+        }
+      ]
+    },
+    {
+      "id": "inception3a_1x1",
+      "name": "分支 1",
+      "type": "conv2d",
+      "description": "64×1×1\n1 层",
+      "filters": 64,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 64]
+    },
+    {
+      "id": "inception3a_3x3_reduce",
+      "name": "分支 2",
+      "type": "conv2d",
+      "description": "96×1×1 → 128×3×3\n2 层",
+      "filters": 96,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 96]
+    },
+    {
+      "id": "inception3a_3x3",
+      "name": "分支 2",
+      "type": "conv2d",
+      "filters": 128,
+      "kernelSize": [3, 3],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 128]
+    },
+    {
+      "id": "inception3a_5x5_reduce",
+      "name": "分支 3",
+      "type": "conv2d",
+      "description": "16×1×1 → 32×5×5\n2 层",
+      "filters": 16,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 16]
+    },
+    {
+      "id": "inception3a_5x5",
+      "name": "分支 3",
+      "type": "conv2d",
+      "filters": 32,
+      "kernelSize": [5, 5],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 32]
+    },
+    {
+      "id": "inception3a_pool",
+      "name": "分支 4",
+      "type": "maxpool2d",
+      "description": "Pool 3×3 → 32×1×1\n2 层",
+      "poolSize": [3, 3],
+      "stride": [1, 1],
+      "outputShape": [28, 28, 192]
+    },
+    {
+      "id": "inception3a_pool_proj",
+      "name": "分支 4",
+      "type": "conv2d",
+      "filters": 32,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 32]
+    },
+    {
+      "id": "concat3a",
+      "name": "concat3a",
+      "type": "concat",
+      "description": "第一个 Inception 模块，包含 4 个并行分支处理多尺度特征",
+      "outputShape": [28, 28, 256]
+    },
+    {
+      "id": "inception3b_1x1",
+      "name": "分支 1",
+      "type": "conv2d",
+      "description": "128×1×1\n1 层",
+      "filters": 128,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 128]
+    },
+    {
+      "id": "inception3b_3x3_reduce",
+      "name": "分支 2",
+      "type": "conv2d",
+      "description": "128×1×1 → 192×3×3\n2 层",
+      "filters": 128,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 128]
+    },
+    {
+      "id": "inception3b_3x3",
+      "name": "分支 2",
+      "type": "conv2d",
+      "filters": 192,
+      "kernelSize": [3, 3],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 192]
+    },
+    {
+      "id": "inception3b_5x5_reduce",
+      "name": "分支 3",
+      "type": "conv2d",
+      "description": "32×1×1 → 96×5×5\n2 层",
+      "filters": 32,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 32]
+    },
+    {
+      "id": "inception3b_5x5",
+      "name": "分支 3",
+      "type": "conv2d",
+      "filters": 96,
+      "kernelSize": [5, 5],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 96]
+    },
+    {
+      "id": "inception3b_pool",
+      "name": "分支 4",
+      "type": "maxpool2d",
+      "description": "Pool 3×3 → 64×1×1\n2 层",
+      "poolSize": [3, 3],
+      "stride": [1, 1],
+      "outputShape": [28, 28, 256]
+    },
+    {
+      "id": "inception3b_pool_proj",
+      "name": "分支 4",
+      "type": "conv2d",
+      "filters": 64,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [28, 28, 64]
+    },
+    {
+      "id": "concat3b",
+      "name": "concat3b",
+      "type": "concat",
+      "description": "第二个 Inception 模块，继续提取多尺度特征",
+      "outputShape": [28, 28, 480]
+    },
+    {
+      "id": "pool3",
+      "name": "MaxPool3",
+      "type": "maxpool2d",
+      "description": "降低特征图尺寸",
+      "poolSize": [3, 3],
+      "stride": [2, 2],
+      "outputShape": [14, 14, 480]
+    },
+    {
+      "id": "inception4a_1x1",
+      "name": "分支 1",
+      "type": "conv2d",
+      "description": "192×1×1\n1 层",
+      "filters": 192,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [14, 14, 192]
+    },
+    {
+      "id": "inception4a_3x3_reduce",
+      "name": "分支 2",
+      "type": "conv2d",
+      "description": "96×1×1 → 208×3×3\n2 层",
+      "filters": 96,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [14, 14, 96]
+    },
+    {
+      "id": "inception4a_3x3",
+      "name": "分支 2",
+      "type": "conv2d",
+      "filters": 208,
+      "kernelSize": [3, 3],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [14, 14, 208]
+    },
+    {
+      "id": "inception4a_5x5_reduce",
+      "name": "分支 3",
+      "type": "conv2d",
+      "description": "16×1×1 → 48×5×5\n2 层",
+      "filters": 16,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [14, 14, 16]
+    },
+    {
+      "id": "inception4a_5x5",
+      "name": "分支 3",
+      "type": "conv2d",
+      "filters": 48,
+      "kernelSize": [5, 5],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [14, 14, 48]
+    },
+    {
+      "id": "inception4a_pool",
+      "name": "分支 4",
+      "type": "maxpool2d",
+      "description": "Pool 3×3 → 64×1×1\n2 层",
+      "poolSize": [3, 3],
+      "stride": [1, 1],
+      "outputShape": [14, 14, 480]
+    },
+    {
+      "id": "inception4a_pool_proj",
+      "name": "分支 4",
+      "type": "conv2d",
+      "filters": 64,
+      "kernelSize": [1, 1],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "activation": "relu",
+      "outputShape": [14, 14, 64]
+    },
+    {
+      "id": "concat4a",
+      "name": "concat4a",
+      "type": "concat",
+      "description": "更深层的 Inception 模块",
+      "outputShape": [14, 14, 512]
+    },
+    {
+      "id": "pool4",
+      "name": "AvgPool",
+      "type": "avgpool2d",
+      "description": "全局平均池化",
+      "poolSize": [7, 7],
+      "stride": [1, 1],
+      "outputShape": [1, 1, 512]
+    },
+    {
+      "id": "flatten",
+      "name": "Flatten",
+      "type": "flatten",
+      "description": "展平为一维向量",
+      "outputShape": [512]
+    },
+    {
+      "id": "dropout",
+      "name": "Dropout",
+      "type": "dropout",
+      "description": "防止过拟合",
+      "rate": 0.4,
+      "outputShape": [512]
+    },
+    {
+      "id": "fc",
+      "name": "全连接层",
+      "type": "dense",
+      "description": "分类前的全连接层",
+      "units": 1000,
+      "activation": "relu",
+      "outputShape": [1000]
+    },
+    {
+      "id": "output",
+      "name": "输出层",
+      "type": "output",
+      "description": "1000 类别输出",
+      "activation": "softmax",
+      "outputShape": [1000]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "input",
+      "target": "stem_network",
+      "type": "normal"
+    },
+    {
+      "id": "e2",
+      "source": "stem_network",
+      "target": "inception3a_1x1",
+      "type": "normal"
+    },
+    {
+      "id": "e3",
+      "source": "stem_network",
+      "target": "inception3a_3x3_reduce",
+      "type": "normal"
+    },
+    {
+      "id": "e4",
+      "source": "stem_network",
+      "target": "inception3a_5x5_reduce",
+      "type": "normal"
+    },
+    {
+      "id": "e5",
+      "source": "stem_network",
+      "target": "inception3a_pool",
+      "type": "normal"   
+    },
+    {
+      "id": "e6_1",
+      "source": "pool2",
+      "target": "inception3a_1x1",
+      "type": "normal"
+    },
+    {
+      "id": "e6_2",
+      "source": "pool2",
+      "target": "inception3a_3x3_reduce",
+      "type": "normal"
+    },
+    {
+      "id": "e6_3",
+      "source": "pool2",
+      "target": "inception3a_5x5_reduce",
+      "type": "normal"
+    },
+    {
+      "id": "e6_4",
+      "source": "pool2",
+      "target": "inception3a_pool",
+      "type": "normal"
+    },
+    {
+      "id": "e7_1",
+      "source": "inception3a_3x3_reduce",
+      "target": "inception3a_3x3",
+      "type": "normal"
+    },
+    {
+      "id": "e7_2",
+      "source": "inception3a_5x5_reduce",
+      "target": "inception3a_5x5",
+      "type": "normal"
+    },
+    {
+      "id": "e7_3",
+      "source": "inception3a_pool",
+      "target": "inception3a_pool_proj",
+      "type": "normal"
+    },
+    {
+      "id": "e8_1",
+      "source": "inception3a_1x1",
+      "target": "concat3a",
+      "type": "normal"
+    },
+    {
+      "id": "e8_2",
+      "source": "inception3a_3x3",
+      "target": "concat3a",
+      "type": "normal"
+    },
+    {
+      "id": "e8_3",
+      "source": "inception3a_5x5",
+      "target": "concat3a",
+      "type": "normal"
+    },
+    {
+      "id": "e8_4",
+      "source": "inception3a_pool_proj",
+      "target": "concat3a",
+      "type": "normal"
+    },
+    {
+      "id": "e9_1",
+      "source": "concat3a",
+      "target": "inception3b_1x1",
+      "type": "normal"
+    },
+    {
+      "id": "e9_2",
+      "source": "concat3a",
+      "target": "inception3b_3x3_reduce",
+      "type": "normal"
+    },
+    {
+      "id": "e9_3",
+      "source": "concat3a",
+      "target": "inception3b_5x5_reduce",
+      "type": "normal"
+    },
+    {
+      "id": "e9_4",
+      "source": "concat3a",
+      "target": "inception3b_pool",
+      "type": "normal"
+    },
+    {
+      "id": "e10_1",
+      "source": "inception3b_3x3_reduce",
+      "target": "inception3b_3x3",
+      "type": "normal"
+    },
+    {
+      "id": "e10_2",
+      "source": "inception3b_5x5_reduce",
+      "target": "inception3b_5x5",
+      "type": "normal"
+    },
+    {
+      "id": "e10_3",
+      "source": "inception3b_pool",
+      "target": "inception3b_pool_proj",
+      "type": "normal"
+    },
+    {
+      "id": "e11_1",
+      "source": "inception3b_1x1",
+      "target": "concat3b",
+      "type": "normal"
+    },
+    {
+      "id": "e11_2",
+      "source": "inception3b_3x3",
+      "target": "concat3b",
+      "type": "normal"
+    },
+    {
+      "id": "e11_3",
+      "source": "inception3b_5x5",
+      "target": "concat3b",
+      "type": "normal"
+    },
+    {
+      "id": "e11_4",
+      "source": "inception3b_pool_proj",
+      "target": "concat3b",
+      "type": "normal"
+    },
+    {
+      "id": "e12",
+      "source": "concat3b",
+      "target": "pool3",
+      "type": "normal"
+    },
+    {
+      "id": "e13_1",
+      "source": "pool3",
+      "target": "inception4a_1x1",
+      "type": "normal"
+    },
+    {
+      "id": "e13_2",
+      "source": "pool3",
+      "target": "inception4a_3x3_reduce",
+      "type": "normal"
+    },
+    {
+      "id": "e13_3",
+      "source": "pool3",
+      "target": "inception4a_5x5_reduce",
+      "type": "normal"
+    },
+    {
+      "id": "e13_4",
+      "source": "pool3",
+      "target": "inception4a_pool",
+      "type": "normal"
+    },
+    {
+      "id": "e14_1",
+      "source": "inception4a_3x3_reduce",
+      "target": "inception4a_3x3",
+      "type": "normal"
+    },
+    {
+      "id": "e14_2",
+      "source": "inception4a_5x5_reduce",
+      "target": "inception4a_5x5",
+      "type": "normal"
+    },
+    {
+      "id": "e14_3",
+      "source": "inception4a_pool",
+      "target": "inception4a_pool_proj",
+      "type": "normal"
+    },
+    {
+      "id": "e15_1",
+      "source": "inception4a_1x1",
+      "target": "concat4a",
+      "type": "normal"
+    },
+    {
+      "id": "e15_2",
+      "source": "inception4a_3x3",
+      "target": "concat4a",
+      "type": "normal"
+    },
+    {
+      "id": "e15_3",
+      "source": "inception4a_5x5",
+      "target": "concat4a",
+      "type": "normal"
+    },
+    {
+      "id": "e15_4",
+      "source": "inception4a_pool_proj",
+      "target": "concat4a",
+      "type": "normal"
+    },
+    {
+      "id": "e16",
+      "source": "concat4a",
+      "target": "pool4",
+      "type": "normal"
+    },
+    {
+      "id": "e17",
+      "source": "pool4",
+      "target": "flatten",
+      "type": "normal"
+    },
+    {
+      "id": "e18",
+      "source": "flatten",
+      "target": "dropout",
+      "type": "normal"
+    },
+    {
+      "id": "e19",
+      "source": "dropout",
+      "target": "fc",
+      "type": "normal"
+    },
+    {
+      "id": "e20",
+      "source": "fc",
+      "target": "output",
+      "type": "normal"
+    }
+  ]
+}

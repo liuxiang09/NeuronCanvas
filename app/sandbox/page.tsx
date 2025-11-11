@@ -1,56 +1,50 @@
-"use client";
+"use client"
 
-import { ComponentPalette } from "./_components/ComponentPalette";
-import { Canvas } from "./_components/Canvas";
-import { PropertiesInspector } from "./_components/PropertiesInspector";
+import Link from "next/link"
+import { Construction, ArrowLeft, Sparkles } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
-/**
- * 沙盒页面 - NeuronCanvas 的交互式模型构建工具
- * 
- * 设计理念：
- * - 经典的三栏布局
- * - 左侧：组件面板（可拖拽的基础神经网络层）
- * - 中间：画布（拖放和连接组件）
- * - 右侧：属性检查器（查看和编辑选中组件的参数）
- * 
- * 技术实现：
- * - 使用 Zustand 管理全局状态
- * - 支持拖拽交互
- * - 实时计算张量形状（待实现）
- * - 导出代码功能（待实现）
- */
 export default function SandboxPage() {
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col">
-      {/* 页面标题栏 */}
-      <div className="border-b bg-background">
-        <div className="container flex h-14 items-center justify-between">
-          <div>
-            <h1 className="text-lg font-semibold">沙盒工具</h1>
-            <p className="text-xs text-muted-foreground">
-              拖拽组件构建你的神经网络
-            </p>
+    <div className="flex-1 flex items-center justify-center">
+      <div className="container max-w-2xl px-4 text-center">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
+          <Construction className="h-10 w-10 text-primary" />
+        </div>
+        
+        <h1 className="text-4xl font-bold mb-4">沙盒模式</h1>
+        <p className="text-lg text-muted-foreground mb-8">
+          即将推出!在沙盒模式中,你将能够自由创建和编辑自己的神经网络架构。
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <Button asChild size="lg">
+            <Link href="/gallery">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              浏览现有模型
+            </Link>
+          </Button>
+          <Button variant="outline" asChild size="lg">
+            <Link href="/">
+              返回首页
+            </Link>
+          </Button>
+        </div>
+
+        <div className="border border-border rounded-lg p-6 bg-muted/30">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h3 className="font-semibold">计划中的功能</h3>
           </div>
-          
-          {/* TODO: 添加工具栏按钮（保存、导出代码等） */}
-          <div className="flex items-center gap-2">
-            {/* <Button variant="outline" size="sm">保存</Button> */}
-            {/* <Button variant="outline" size="sm">导出代码</Button> */}
-          </div>
+          <ul className="text-sm text-muted-foreground space-y-2 text-left max-w-md mx-auto">
+            <li>• 拖拽添加各种类型的层</li>
+            <li>• 自定义层的参数</li>
+            <li>• 实时预览网络结构</li>
+            <li>• 导出为 JSON 或代码</li>
+            <li>• 分享你的架构设计</li>
+          </ul>
         </div>
       </div>
-
-      {/* 三栏布局 */}
-      <div className="flex-1 grid grid-cols-[250px_1fr_300px] overflow-hidden">
-        {/* 左侧：组件面板 */}
-        <ComponentPalette />
-
-        {/* 中间：画布 */}
-        <Canvas />
-
-        {/* 右侧：属性检查器 */}
-        <PropertiesInspector />
-      </div>
     </div>
-  );
+  )
 }

@@ -1,0 +1,755 @@
+{
+  "metadata": {
+    "name": "resnet50",
+    "displayName": "ResNet-50(未验证)",
+    "description": "ResNet-50 是微软研究院在 2015 年提出的深度残差网络，通过引入残差连接（skip connection）解决了深层网络的退化问题。ResNet-50 使用瓶颈结构的残差块，包含 50 层网络，在 ImageNet 上取得了优异的性能。残差连接允许梯度直接反向传播，使训练超深网络成为可能。",
+    "year": 2015,
+    "authors": [
+      "Kaiming He",
+      "Xiangyu Zhang",
+      "Shaoqing Ren",
+      "Jian Sun"
+    ],
+    "paper": "https://arxiv.org/abs/1512.03385",
+    "paperTitle": "Deep residual learning for image recognition",
+    "citations": 292879,
+    "tags": [
+      "CNN",
+      "残差网络",
+      "图像分类",
+      "深度学习",
+      "ImageNet"
+    ],
+    "category": "CNN"
+  },
+  "layers": [
+    {
+      "id": "input",
+      "name": "输入层",
+      "type": "input",
+      "description": "224×224 RGB 图像输入",
+      "shape": [
+        224,
+        224,
+        3
+      ]
+    },
+    {
+      "id": "conv1",
+      "name": "Conv1",
+      "type": "conv2d",
+      "description": "初始卷积层",
+      "filters": 64,
+      "kernelSize": [
+        7,
+        7
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        112,
+        112,
+        64
+      ]
+    },
+    {
+      "id": "pool1",
+      "name": "MaxPool",
+      "type": "maxpool2d",
+      "description": "最大池化",
+      "poolSize": [
+        3,
+        3
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "outputShape": [
+        56,
+        56,
+        64
+      ]
+    },
+    {
+      "id": "res2a",
+      "name": "Residual Block 2a",
+      "type": "stem",
+      "description": "第一个残差块，包含瓶颈结构：1×1降维→3×3卷积→1×1升维",
+      "inputShape": [
+        56,
+        56,
+        64
+      ],
+      "outputShape": [
+        56,
+        56,
+        256
+      ],
+      "color": "emerald",
+      "steps": [
+        {
+          "id": "res2a_1x1_reduce",
+          "name": "1×1 Reduce",
+          "type": "conv2d",
+          "description": "降维",
+          "filters": 64,
+          "kernelSize": [
+            1,
+            1
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "activation": "relu",
+          "outputShape": [
+            56,
+            56,
+            64
+          ]
+        },
+        {
+          "id": "res2a_3x3",
+          "name": "3×3 Conv",
+          "type": "conv2d",
+          "description": "主卷积",
+          "filters": 64,
+          "kernelSize": [
+            3,
+            3
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "activation": "relu",
+          "outputShape": [
+            56,
+            56,
+            64
+          ]
+        },
+        {
+          "id": "res2a_1x1_increase",
+          "name": "1×1 Increase",
+          "type": "conv2d",
+          "description": "升维",
+          "filters": 256,
+          "kernelSize": [
+            1,
+            1
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "outputShape": [
+            56,
+            56,
+            256
+          ]
+        }
+      ]
+    },
+    {
+      "id": "proj2a",
+      "name": "Projection 2a",
+      "type": "conv2d",
+      "description": "投影快捷连接：1×1卷积匹配维度 64→256",
+      "filters": 256,
+      "kernelSize": [
+        1,
+        1
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "outputShape": [
+        56,
+        56,
+        256
+      ]
+    },
+    {
+      "id": "add2a",
+      "name": "Add 2a",
+      "type": "add",
+      "description": "残差相加：主路径 + 快捷连接",
+      "inputShapes": [
+        [
+          56,
+          56,
+          256
+        ],
+        [
+          56,
+          56,
+          256
+        ]
+      ],
+      "outputShape": [
+        56,
+        56,
+        256
+      ]
+    },
+    {
+      "id": "res2b",
+      "name": "Residual Block 2b",
+      "type": "stem",
+      "description": "第二个残差块",
+      "inputShape": [
+        56,
+        56,
+        256
+      ],
+      "outputShape": [
+        56,
+        56,
+        256
+      ],
+      "color": "emerald",
+      "steps": [
+        {
+          "id": "res2b_1x1_reduce",
+          "name": "1×1 Reduce",
+          "type": "conv2d",
+          "filters": 64,
+          "kernelSize": [
+            1,
+            1
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "activation": "relu",
+          "outputShape": [
+            56,
+            56,
+            64
+          ]
+        },
+        {
+          "id": "res2b_3x3",
+          "name": "3×3 Conv",
+          "type": "conv2d",
+          "filters": 64,
+          "kernelSize": [
+            3,
+            3
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "activation": "relu",
+          "outputShape": [
+            56,
+            56,
+            64
+          ]
+        },
+        {
+          "id": "res2b_1x1_increase",
+          "name": "1×1 Increase",
+          "type": "conv2d",
+          "filters": 256,
+          "kernelSize": [
+            1,
+            1
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "outputShape": [
+            56,
+            56,
+            256
+          ]
+        }
+      ]
+    },
+    {
+      "id": "add2b",
+      "name": "Add 2b",
+      "type": "add",
+      "description": "残差相加",
+      "inputShapes": [
+        [
+          56,
+          56,
+          256
+        ],
+        [
+          56,
+          56,
+          256
+        ]
+      ],
+      "outputShape": [
+        56,
+        56,
+        256
+      ]
+    },
+    {
+      "id": "res2c",
+      "name": "Residual Block 2c",
+      "type": "stem",
+      "description": "第三个残差块",
+      "inputShape": [
+        56,
+        56,
+        256
+      ],
+      "outputShape": [
+        56,
+        56,
+        256
+      ],
+      "color": "emerald",
+      "steps": [
+        {
+          "id": "res2c_1x1_reduce",
+          "name": "1×1 Reduce",
+          "type": "conv2d",
+          "filters": 64,
+          "kernelSize": [
+            1,
+            1
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "activation": "relu",
+          "outputShape": [
+            56,
+            56,
+            64
+          ]
+        },
+        {
+          "id": "res2c_3x3",
+          "name": "3×3 Conv",
+          "type": "conv2d",
+          "filters": 64,
+          "kernelSize": [
+            3,
+            3
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "activation": "relu",
+          "outputShape": [
+            56,
+            56,
+            64
+          ]
+        },
+        {
+          "id": "res2c_1x1_increase",
+          "name": "1×1 Increase",
+          "type": "conv2d",
+          "filters": 256,
+          "kernelSize": [
+            1,
+            1
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "outputShape": [
+            56,
+            56,
+            256
+          ]
+        }
+      ]
+    },
+    {
+      "id": "add2c",
+      "name": "Add 2c",
+      "type": "add",
+      "description": "残差相加",
+      "inputShapes": [
+        [
+          56,
+          56,
+          256
+        ],
+        [
+          56,
+          56,
+          256
+        ]
+      ],
+      "outputShape": [
+        56,
+        56,
+        256
+      ]
+    },
+    {
+      "id": "res3a",
+      "name": "Residual Block 3a",
+      "type": "stem",
+      "description": "Stage 3 的第一个残差块，有下采样",
+      "inputShape": [
+        56,
+        56,
+        256
+      ],
+      "outputShape": [
+        28,
+        28,
+        512
+      ],
+      "color": "emerald",
+      "steps": [
+        {
+          "id": "res3a_1x1_reduce",
+          "name": "1×1 Reduce",
+          "type": "conv2d",
+          "filters": 128,
+          "kernelSize": [
+            1,
+            1
+          ],
+          "stride": [
+            2,
+            2
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "activation": "relu",
+          "outputShape": [
+            28,
+            28,
+            128
+          ]
+        },
+        {
+          "id": "res3a_3x3",
+          "name": "3×3 Conv",
+          "type": "conv2d",
+          "filters": 128,
+          "kernelSize": [
+            3,
+            3
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "activation": "relu",
+          "outputShape": [
+            28,
+            28,
+            128
+          ]
+        },
+        {
+          "id": "res3a_1x1_increase",
+          "name": "1×1 Increase",
+          "type": "conv2d",
+          "filters": 512,
+          "kernelSize": [
+            1,
+            1
+          ],
+          "stride": [
+            1,
+            1
+          ],
+          "padding": [
+            1,
+            1
+          ],
+          "outputShape": [
+            28,
+            28,
+            512
+          ]
+        }
+      ]
+    },
+    {
+      "id": "proj3a",
+      "name": "Projection 3a",
+      "type": "conv2d",
+      "description": "投影快捷连接：1×1卷积匹配维度和尺寸 256→512，同时下采样",
+      "filters": 512,
+      "kernelSize": [
+        1,
+        1
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "outputShape": [
+        28,
+        28,
+        512
+      ]
+    },
+    {
+      "id": "add3a",
+      "name": "Add 3a",
+      "type": "add",
+      "description": "残差相加（快捷连接通过投影匹配维度）",
+      "inputShapes": [
+        [
+          28,
+          28,
+          512
+        ],
+        [
+          28,
+          28,
+          512
+        ]
+      ],
+      "outputShape": [
+        28,
+        28,
+        512
+      ]
+    },
+    {
+      "id": "pool_final",
+      "name": "Global AvgPool",
+      "type": "avgpool2d",
+      "description": "全局平均池化",
+      "poolSize": [
+        7,
+        7
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "outputShape": [
+        1,
+        1,
+        512
+      ]
+    },
+    {
+      "id": "flatten",
+      "name": "Flatten",
+      "type": "flatten",
+      "description": "展平为一维向量",
+      "outputShape": [
+        512
+      ]
+    },
+    {
+      "id": "fc",
+      "name": "全连接层",
+      "type": "dense",
+      "description": "最终分类层",
+      "units": 1000,
+      "activation": "relu",
+      "outputShape": [
+        1000
+      ]
+    },
+    {
+      "id": "output",
+      "name": "输出层",
+      "type": "output",
+      "description": "1000 类别输出",
+      "units": 1000,
+      "activation": "softmax",
+      "outputType": "classification"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "input",
+      "target": "conv1",
+      "type": "normal"
+    },
+    {
+      "id": "e2",
+      "source": "conv1",
+      "target": "pool1",
+      "type": "normal"
+    },
+    {
+      "id": "e3",
+      "source": "pool1",
+      "target": "res2a",
+      "type": "normal"
+    },
+    {
+      "id": "e4",
+      "source": "res2a",
+      "target": "add2a",
+      "type": "normal"
+    },
+    {
+      "id": "e5",
+      "source": "pool1",
+      "target": "proj2a",
+      "type": "residual"
+    },
+    {
+      "id": "e5b",
+      "source": "proj2a",
+      "target": "add2a",
+      "type": "residual"
+    },
+    {
+      "id": "e6",
+      "source": "add2a",
+      "target": "res2b",
+      "type": "normal"
+    },
+    {
+      "id": "e7",
+      "source": "res2b",
+      "target": "add2b",
+      "type": "normal"
+    },
+    {
+      "id": "e8",
+      "source": "add2a",
+      "target": "add2b",
+      "type": "residual"
+    },
+    {
+      "id": "e9",
+      "source": "add2b",
+      "target": "res2c",
+      "type": "normal"
+    },
+    {
+      "id": "e10",
+      "source": "res2c",
+      "target": "add2c",
+      "type": "normal"
+    },
+    {
+      "id": "e11",
+      "source": "add2b",
+      "target": "add2c",
+      "type": "residual"
+    },
+    {
+      "id": "e12",
+      "source": "add2c",
+      "target": "res3a",
+      "type": "normal"
+    },
+    {
+      "id": "e13",
+      "source": "res3a",
+      "target": "add3a",
+      "type": "normal"
+    },
+    {
+      "id": "e14",
+      "source": "add2c",
+      "target": "proj3a",
+      "type": "residual"
+    },
+    {
+      "id": "e14b",
+      "source": "proj3a",
+      "target": "add3a",
+      "type": "residual"
+    },
+    {
+      "id": "e15",
+      "source": "add3a",
+      "target": "pool_final",
+      "type": "normal"
+    },
+    {
+      "id": "e16",
+      "source": "pool_final",
+      "target": "flatten",
+      "type": "normal"
+    },
+    {
+      "id": "e17",
+      "source": "flatten",
+      "target": "fc",
+      "type": "normal"
+    },
+    {
+      "id": "e18",
+      "source": "fc",
+      "target": "output",
+      "type": "normal"
+    }
+  ]
+}

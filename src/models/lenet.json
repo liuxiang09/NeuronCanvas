@@ -1,0 +1,157 @@
+{
+  "metadata": {
+    "name": "lenet",
+    "displayName": "LeNet-5",
+    "description": "LeNet-5 是由 Yann LeCun 等人于 1998 年提出的经典卷积神经网络,主要用于手写数字识别。它是深度学习历史上第一个成功应用于实际问题的卷积神经网络,为现代 CNN 架构奠定了基础。",
+    "year": 1998,
+    "authors": [
+      "Yann LeCun",
+      "Léon Bottou",
+      "Yoshua Bengio",
+      "Patrick Haffner"
+    ],
+    "paper": "http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf",
+    "paperTitle": "Gradient-based learning applied to document recognition",
+    "citations": 80673,
+    "tags": ["CNN", "经典", "图像分类", "手写识别"],
+    "category": "CNN"
+  },
+  "layers": [
+    {
+      "id": "input",
+      "name": "输入层",
+      "type": "input",
+      "description": "接收32x32像素的单通道灰度图像。",
+      "shape": [32, 32, 1]
+    },
+    {
+      "id": "c1",
+      "name": "卷积层C1",
+      "type": "conv2d",
+      "description": "第一个卷积层，使用6个5x5的卷积核来提取图像中的基本特征，例如边缘和角落。",
+      "filters": 6,
+      "kernelSize": [5, 5],
+      "stride": [1, 1],
+      "padding": [0, 0],
+      "activation": "tanh",
+      "outputShape": [28, 28, 6]
+    },
+    {
+      "id": "s2",
+      "name": "池化层S2",
+      "type": "avgpool2d",
+      "description": "进行平均池化操作，将特征图的尺寸减半，从而减少参数数量，并提供对特征微小位移的不变性。",
+      "poolSize": [2, 2],
+      "stride": [2, 2],
+      "padding": [0, 0],
+      "outputShape": [14, 14, 6]
+    },
+    {
+      "id": "c3",
+      "name": "卷积层C3",
+      "type": "conv2d",
+      "description": "第二个卷积层，通过组合前一层提取的特征来学习更复杂、更抽象的组合特征。",
+      "filters": 16,
+      "kernelSize": [5, 5],
+      "stride": [1, 1],
+      "padding": [0, 0],
+      "activation": "tanh",
+      "outputShape": [10, 10, 16]
+    },
+    {
+      "id": "s4",
+      "name": "池化层S4",
+      "type": "avgpool2d",
+      "description": "再次进行平均池化，进一步缩小特征图尺寸，为全连接层做准备。",
+      "poolSize": [2, 2],
+      "stride": [2, 2],
+      "padding": [0, 0],
+      "outputShape": [5, 5, 16]
+    },
+    {
+      "id": "c5",
+      "name": "卷积层C5",
+      "type": "conv2d",
+      "description": "这是一个卷积层，但其功能类似于全连接层，因为它将5x5x16的输入转换为1x1x120的输出，完成了特征的最终提取和整合。",
+      "filters": 120,
+      "kernelSize": [5, 5],
+      "stride": [1, 1],
+      "padding": [0, 0],
+      "activation": "tanh",
+      "outputShape": [1, 1, 120]
+    },
+    {
+      "id": "flatten",
+      "name": "展平层",
+      "type": "flatten",
+      "description": "将特征图展平为一维向量",
+      "outputShape": [120]
+    },
+    {
+      "id": "f6",
+      "name": "全连接层F6",
+      "type": "dense",
+      "description": "将前一层的高级特征进行组合，为最终的分类任务做准备。",
+      "activation": "tanh",
+      "outputShape": [84]
+    },
+    {
+      "id": "output",
+      "name": "输出层",
+      "type": "output",
+      "description": "最终的输出层，有10个神经元，分别对应0到9这10个数字的概率。",
+      "activation": "softmax",
+      "outputShape": [10]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "input",
+      "target": "c1",
+      "type": "normal"
+    },
+    {
+      "id": "e2",
+      "source": "c1",
+      "target": "s2",
+      "type": "normal"
+    },
+    {
+      "id": "e3",
+      "source": "s2",
+      "target": "c3",
+      "type": "normal"
+    },
+    {
+      "id": "e4",
+      "source": "c3",
+      "target": "s4",
+      "type": "normal"
+    },
+    {
+      "id": "e5",
+      "source": "s4",
+      "target": "c5",
+      "type": "normal"
+    },
+    {
+      "id": "e6",
+      "source": "c5",
+      "target": "flatten",
+      "type": "normal"
+    },
+    {
+      "id": "e7",
+      "source": "flatten",
+      "target": "f6",
+      "type": "normal"
+    },
+    {
+      "id": "e8",
+      "source": "f6",
+      "target": "output",
+      "type": "normal"
+    }
+  ]
+}

@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 自定义 CSS 变量，用于 shadcn/ui 的主题系统 */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -59,32 +58,29 @@
   }
 }
 
-/* 自定义全局样式 - 为 NeuronCanvas 添加科技感 */
+/* Custom scrollbar styles */
 @layer utilities {
-  /* Glassmorphism 效果 */
-  .glass {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
 
-  .glass-dark {
-    @apply bg-black/10 backdrop-blur-lg border border-black/20;
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-transparent;
   }
 
-  /* 渐变文字效果 */
-  .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600;
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
   }
 
-  /* 网格背景 - 给画布或背景添加科技感 */
-  .grid-background {
-    background-image: 
-      linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-    background-size: 20px 20px;
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-border/80;
   }
+}
 
-  /* 光晕效果 */
-  .glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+/* Smooth transitions for layout shifts */
+@layer components {
+  .page-transition {
+    @apply transition-all duration-300 ease-in-out;
   }
 }
