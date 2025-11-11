@@ -1,0 +1,624 @@
+{
+  "metadata": {
+    "name": "vgg16",
+    "displayName": "VGG-16(未验证)",
+    "description": "VGG-16 是由牛津大学视觉几何组(VGG)于 2014 年提出的深度卷积神经网络。它使用非常小的 3×3 卷积核,通过堆叠多个卷积层来增加网络深度,证明了网络深度对性能的重要性。",
+    "year": 2014,
+    "authors": [
+      "Karen Simonyan",
+      "Andrew Zisserman"
+    ],
+    "paper": "https://arxiv.org/abs/1409.1556",
+    "paperTitle": "Very deep convolutional networks for large-scale image recognition",
+    "citations": 108537,
+    "tags": [
+      "CNN",
+      "图像分类",
+      "深度网络",
+      "经典"
+    ],
+    "category": "CNN"
+  },
+  "layers": [
+    {
+      "id": "input",
+      "name": "输入层",
+      "type": "input",
+      "description": "224×224 RGB 图像",
+      "shape": [
+        224,
+        224,
+        3
+      ]
+    },
+    {
+      "id": "conv1_1",
+      "name": "Conv 1-1",
+      "type": "conv2d",
+      "filters": 64,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        224,
+        224,
+        64
+      ]
+    },
+    {
+      "id": "conv1_2",
+      "name": "Conv 1-2",
+      "type": "conv2d",
+      "filters": 64,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        224,
+        224,
+        64
+      ]
+    },
+    {
+      "id": "pool1",
+      "name": "Pool 1",
+      "type": "maxpool2d",
+      "poolSize": [
+        2,
+        2
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "outputShape": [
+        112,
+        112,
+        64
+      ]
+    },
+    {
+      "id": "conv2_1",
+      "name": "Conv 2-1",
+      "type": "conv2d",
+      "filters": 128,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        112,
+        112,
+        128
+      ]
+    },
+    {
+      "id": "conv2_2",
+      "name": "Conv 2-2",
+      "type": "conv2d",
+      "filters": 128,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        112,
+        112,
+        128
+      ]
+    },
+    {
+      "id": "pool2",
+      "name": "Pool 2",
+      "type": "maxpool2d",
+      "poolSize": [
+        2,
+        2
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "outputShape": [
+        56,
+        56,
+        128
+      ]
+    },
+    {
+      "id": "conv3_1",
+      "name": "Conv 3-1",
+      "type": "conv2d",
+      "filters": 256,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        56,
+        56,
+        256
+      ]
+    },
+    {
+      "id": "conv3_2",
+      "name": "Conv 3-2",
+      "type": "conv2d",
+      "filters": 256,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        56,
+        56,
+        256
+      ]
+    },
+    {
+      "id": "conv3_3",
+      "name": "Conv 3-3",
+      "type": "conv2d",
+      "filters": 256,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        56,
+        56,
+        256
+      ]
+    },
+    {
+      "id": "pool3",
+      "name": "Pool 3",
+      "type": "maxpool2d",
+      "poolSize": [
+        2,
+        2
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "outputShape": [
+        28,
+        28,
+        256
+      ]
+    },
+    {
+      "id": "conv4_1",
+      "name": "Conv 4-1",
+      "type": "conv2d",
+      "filters": 512,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        28,
+        28,
+        512
+      ]
+    },
+    {
+      "id": "conv4_2",
+      "name": "Conv 4-2",
+      "type": "conv2d",
+      "filters": 512,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        28,
+        28,
+        512
+      ]
+    },
+    {
+      "id": "conv4_3",
+      "name": "Conv 4-3",
+      "type": "conv2d",
+      "filters": 512,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        28,
+        28,
+        512
+      ]
+    },
+    {
+      "id": "pool4",
+      "name": "Pool 4",
+      "type": "maxpool2d",
+      "poolSize": [
+        2,
+        2
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "outputShape": [
+        14,
+        14,
+        512
+      ]
+    },
+    {
+      "id": "conv5_1",
+      "name": "Conv 5-1",
+      "type": "conv2d",
+      "filters": 512,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        14,
+        14,
+        512
+      ]
+    },
+    {
+      "id": "conv5_2",
+      "name": "Conv 5-2",
+      "type": "conv2d",
+      "filters": 512,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        14,
+        14,
+        512
+      ]
+    },
+    {
+      "id": "conv5_3",
+      "name": "Conv 5-3",
+      "type": "conv2d",
+      "filters": 512,
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "activation": "relu",
+      "outputShape": [
+        14,
+        14,
+        512
+      ]
+    },
+    {
+      "id": "pool5",
+      "name": "Pool 5",
+      "type": "maxpool2d",
+      "poolSize": [
+        2,
+        2
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "outputShape": [
+        7,
+        7,
+        512
+      ]
+    },
+    {
+      "id": "flatten",
+      "name": "Flatten",
+      "type": "flatten",
+      "outputShape": [
+        25088
+      ]
+    },
+    {
+      "id": "fc1",
+      "name": "FC 1",
+      "type": "dense",
+      "units": 4096,
+      "activation": "relu",
+      "outputShape": [
+        4096
+      ]
+    },
+    {
+      "id": "fc2",
+      "name": "FC 2",
+      "type": "dense",
+      "units": 4096,
+      "activation": "relu",
+      "outputShape": [
+        4096
+      ]
+    },
+    {
+      "id": "fc3",
+      "name": "FC 3",
+      "type": "dense",
+      "units": 1000,
+      "activation": "relu",
+      "outputShape": [
+        1000
+      ]
+    },
+    {
+      "id": "output",
+      "name": "输出层",
+      "type": "output",
+      "description": "1000 类别分类",
+      "units": 1000,
+      "activation": "softmax",
+      "outputType": "classification"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "input",
+      "target": "conv1_1",
+      "type": "normal"
+    },
+    {
+      "id": "e2",
+      "source": "conv1_1",
+      "target": "conv1_2",
+      "type": "normal"
+    },
+    {
+      "id": "e3",
+      "source": "conv1_2",
+      "target": "pool1",
+      "type": "normal"
+    },
+    {
+      "id": "e4",
+      "source": "pool1",
+      "target": "conv2_1",
+      "type": "normal"
+    },
+    {
+      "id": "e5",
+      "source": "conv2_1",
+      "target": "conv2_2",
+      "type": "normal"
+    },
+    {
+      "id": "e6",
+      "source": "conv2_2",
+      "target": "pool2",
+      "type": "normal"
+    },
+    {
+      "id": "e7",
+      "source": "pool2",
+      "target": "conv3_1",
+      "type": "normal"
+    },
+    {
+      "id": "e8",
+      "source": "conv3_1",
+      "target": "conv3_2",
+      "type": "normal"
+    },
+    {
+      "id": "e9",
+      "source": "conv3_2",
+      "target": "conv3_3",
+      "type": "normal"
+    },
+    {
+      "id": "e10",
+      "source": "conv3_3",
+      "target": "pool3",
+      "type": "normal"
+    },
+    {
+      "id": "e11",
+      "source": "pool3",
+      "target": "conv4_1",
+      "type": "normal"
+    },
+    {
+      "id": "e12",
+      "source": "conv4_1",
+      "target": "conv4_2",
+      "type": "normal"
+    },
+    {
+      "id": "e13",
+      "source": "conv4_2",
+      "target": "conv4_3",
+      "type": "normal"
+    },
+    {
+      "id": "e14",
+      "source": "conv4_3",
+      "target": "pool4",
+      "type": "normal"
+    },
+    {
+      "id": "e15",
+      "source": "pool4",
+      "target": "conv5_1",
+      "type": "normal"
+    },
+    {
+      "id": "e16",
+      "source": "conv5_1",
+      "target": "conv5_2",
+      "type": "normal"
+    },
+    {
+      "id": "e17",
+      "source": "conv5_2",
+      "target": "conv5_3",
+      "type": "normal"
+    },
+    {
+      "id": "e18",
+      "source": "conv5_3",
+      "target": "pool5",
+      "type": "normal"
+    },
+    {
+      "id": "e19",
+      "source": "pool5",
+      "target": "flatten",
+      "type": "normal"
+    },
+    {
+      "id": "e20",
+      "source": "flatten",
+      "target": "fc1",
+      "type": "normal"
+    },
+    {
+      "id": "e21",
+      "source": "fc1",
+      "target": "fc2",
+      "type": "normal"
+    },
+    {
+      "id": "e22",
+      "source": "fc2",
+      "target": "fc3",
+      "type": "normal"
+    },
+    {
+      "id": "e23",
+      "source": "fc3",
+      "target": "output",
+      "type": "normal"
+    }
+  ]
+}
