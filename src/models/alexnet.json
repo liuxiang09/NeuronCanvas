@@ -4,12 +4,23 @@
     "displayName": "AlexNet",
     "description": "AlexNet 是由 Alex Krizhevsky 等人于 2012 年提出的深度卷积神经网络,在 ImageNet 竞赛中取得突破性成绩,标志着深度学习时代的开始。它首次证明了深度卷积网络在大规模图像识别任务中的强大能力。",
     "year": 2012,
-    "authors": ["Alex Krizhevsky", "Ilya Sutskever", "Geoffrey Hinton"],
+    "authors": [
+      "Alex Krizhevsky",
+      "Ilya Sutskever",
+      "Geoffrey E. Hinton"
+    ],
     "paper": "https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf",
-    "paperTitle": "ImageNet classification with deep convolutional neural networks",
+    "paperTitle": "ImageNet Classification with Deep Convolutional Neural Networks",
     "citations": 149299,
-    "tags": ["CNN", "图像分类", "经典", "ImageNet"],
-    "category": "CNN"
+    "tags": [
+      "CNN",
+      "图像分类",
+      "MINIST"
+    ],
+    "category": [
+      "CNN"
+    ],
+    "verified": false
   },
   "layers": [
     {
@@ -17,7 +28,12 @@
       "name": "输入层",
       "type": "input",
       "description": "接收原始的图像数据，每个图像为227x227像素，有3个颜色通道（RGB）。",
-      "shape": [227, 227, 3]
+      "shape": [
+        "B",
+        3,
+        227,
+        227
+      ]
     },
     {
       "id": "conv1",
@@ -25,21 +41,81 @@
       "type": "conv2d",
       "description": "使用较大的卷积核快速提取图像的低级特征，如边缘、角落和颜色块。",
       "filters": 96,
-      "kernelSize": [11, 11],
-      "stride": [4, 4],
-      "padding": [0, 0],
+      "kernelSize": [
+        11,
+        11
+      ],
+      "stride": [
+        4,
+        4
+      ],
+      "padding": [
+        0,
+        0
+      ],
+      "outputShape": [
+        "B",
+        96,
+        55,
+        55
+      ]
+    },
+    {
+      "id": "conv1_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [55, 55, 96]
+      "inputShape": [
+        "B",
+        96,
+        55,
+        55
+      ],
+      "outputShape": [
+        "B",
+        96,
+        55,
+        55
+      ]
+    },
+    {
+      "id": "lrn1",
+      "name": "LRN 层-1",
+      "type": "lrn",
+      "description": "局部响应归一化 (Local Response Normalization)",
+      "alpha": 0.0001,
+      "beta": 0.75,
+      "k": 2,
+      "outputShape": [
+        "B",
+        96,
+        55,
+        55
+      ]
     },
     {
       "id": "pool1",
       "name": "池化层-1",
       "type": "maxpool2d",
       "description": "对特征图进行下采样，减少数据维度，保留最显著的特征，并提供平移不变性。",
-      "poolSize": [3, 3],
-      "stride": [2, 2],
-      "padding": [0, 0],
-      "outputShape": [27, 27, 96]
+      "poolSize": [
+        3,
+        3
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "padding": [
+        0,
+        0
+      ],
+      "outputShape": [
+        "B",
+        96,
+        27,
+        27
+      ]
     },
     {
       "id": "conv2",
@@ -47,21 +123,81 @@
       "type": "conv2d",
       "description": "在第一层的基础上学习更复杂、更抽象的特征组合。",
       "filters": 256,
-      "kernelSize": [5, 5],
-      "stride": [1, 1],
-      "padding": [2, 2],
+      "kernelSize": [
+        5,
+        5
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        2,
+        2
+      ],
+      "outputShape": [
+        "B",
+        256,
+        27,
+        27
+      ]
+    },
+    {
+      "id": "conv2_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [27, 27, 256]
+      "inputShape": [
+        "B",
+        256,
+        27,
+        27
+      ],
+      "outputShape": [
+        "B",
+        256,
+        27,
+        27
+      ]
+    },
+    {
+      "id": "lrn2",
+      "name": "LRN 层-2",
+      "type": "lrn",
+      "description": "局部响应归一化 (Local Response Normalization)",
+      "alpha": 0.0001,
+      "beta": 0.75,
+      "k": 2,
+      "outputShape": [
+        "B",
+        256,
+        27,
+        27
+      ]
     },
     {
       "id": "pool2",
       "name": "池化层-2",
       "type": "maxpool2d",
       "description": "进一步缩小特征图的尺寸，减少计算量，并增强特征的鲁棒性。",
-      "poolSize": [3, 3],
-      "stride": [2, 2],
-      "padding": [0, 0],
-      "outputShape": [13, 13, 256]
+      "poolSize": [
+        3,
+        3
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "padding": [
+        0,
+        0
+      ],
+      "outputShape": [
+        "B",
+        256,
+        13,
+        13
+      ]
     },
     {
       "id": "conv3",
@@ -69,11 +205,42 @@
       "type": "conv2d",
       "description": "连续的卷积层之一，使用更小的卷积核来加深网络，学习更深层次的特征。",
       "filters": 384,
-      "kernelSize": [3, 3],
-      "stride": [1, 1],
-      "padding": [1, 1],
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "outputShape": [
+        "B",
+        384,
+        13,
+        13
+      ]
+    },
+    {
+      "id": "conv3_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [13, 13, 384]
+      "inputShape": [
+        "B",
+        384,
+        13,
+        13
+      ],
+      "outputShape": [
+        "B",
+        384,
+        13,
+        13
+      ]
     },
     {
       "id": "conv4",
@@ -81,11 +248,42 @@
       "type": "conv2d",
       "description": "与第三层结构类似，继续提取更复杂的特征表示。",
       "filters": 384,
-      "kernelSize": [3, 3],
-      "stride": [1, 1],
-      "padding": [1, 1],
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "outputShape": [
+        "B",
+        384,
+        13,
+        13
+      ]
+    },
+    {
+      "id": "conv4_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [13, 13, 384]
+      "inputShape": [
+        "B",
+        384,
+        13,
+        13
+      ],
+      "outputShape": [
+        "B",
+        384,
+        13,
+        13
+      ]
     },
     {
       "id": "conv5",
@@ -93,36 +291,100 @@
       "type": "conv2d",
       "description": "最后一个卷积层，为即将到来的全连接层准备最终的特征图。",
       "filters": 256,
-      "kernelSize": [3, 3],
-      "stride": [1, 1],
-      "padding": [1, 1],
+      "kernelSize": [
+        3,
+        3
+      ],
+      "stride": [
+        1,
+        1
+      ],
+      "padding": [
+        1,
+        1
+      ],
+      "outputShape": [
+        "B",
+        256,
+        13,
+        13
+      ]
+    },
+    {
+      "id": "conv5_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [13, 13, 256]
+      "inputShape": [
+        "B",
+        256,
+        13,
+        13
+      ],
+      "outputShape": [
+        "B",
+        256,
+        13,
+        13
+      ]
     },
     {
       "id": "pool3",
       "name": "池化层-3",
       "type": "maxpool2d",
       "description": "最后一次下采样，将特征图压缩到适合全连接层处理的大小。",
-      "poolSize": [3, 3],
-      "stride": [2, 2],
-      "padding": [0, 0],
-      "outputShape": [6, 6, 256]
+      "poolSize": [
+        3,
+        3
+      ],
+      "stride": [
+        2,
+        2
+      ],
+      "padding": [
+        0,
+        0
+      ],
+      "outputShape": [
+        "B",
+        256,
+        6,
+        6
+      ]
     },
     {
       "id": "flatten",
       "name": "展平层",
       "type": "flatten",
       "description": "将卷积层提取的二维特征图“压平”成一维向量",
-      "outputShape": [9216]
+      "outputShape": [
+        "B",
+        9216
+      ]
     },
     {
       "id": "fc1",
       "name": "全连接层-1",
-      "type": "dense",
+      "type": "linear",
       "description": "使用全连接层进行高级特征的组合与分类。",
+      "outputShape": [
+        "B",
+        4096
+      ]
+    },
+    {
+      "id": "fc1_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [4096]
+      "inputShape": [
+        "B",
+        4096
+      ],
+      "outputShape": [
+        "B",
+        4096
+      ]
     },
     {
       "id": "dropout1",
@@ -130,15 +392,34 @@
       "type": "dropout",
       "description": "在训练期间随机“丢弃”一部分神经元，防止神经元之间过度依赖，从而减轻过拟合。",
       "rate": 0.5,
-      "outputShape": [4096]
+      "outputShape": [
+        "B",
+        4096
+      ]
     },
     {
       "id": "fc2",
       "name": "全连接层-2",
-      "type": "dense",
+      "type": "linear",
       "description": "进一步整合特征，增强模型的非线性表达能力。",
+      "outputShape": [
+        "B",
+        4096
+      ]
+    },
+    {
+      "id": "fc2_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [4096]
+      "inputShape": [
+        "B",
+        4096
+      ],
+      "outputShape": [
+        "B",
+        4096
+      ]
     },
     {
       "id": "dropout2",
@@ -146,15 +427,34 @@
       "type": "dropout",
       "description": "再次使用Dropout技术以增强模型的泛化能力。",
       "rate": 0.5,
-      "outputShape": [4096]
+      "outputShape": [
+        "B",
+        4096
+      ]
     },
     {
       "id": "output",
       "name": "输出层",
-      "type": "output",
+      "type": "linear",
       "description": "最终的分类层，将特征映射到1000个类别（针对ImageNet数据集），Softmax函数输出每个类别的概率。",
+      "outputShape": [
+        "B",
+        1000
+      ]
+    },
+    {
+      "id": "output_act",
+      "name": "Softmax 激活",
+      "type": "softmax",
       "activation": "softmax",
-      "outputShape": [1000]
+      "inputShape": [
+        "B",
+        1000
+      ],
+      "outputShape": [
+        "B",
+        1000
+      ]
     }
   ],
   "edges": [
@@ -166,80 +466,140 @@
     },
     {
       "id": "e2",
-      "source": "conv1",
-      "target": "pool1",
+      "source": "conv1_act",
+      "target": "lrn1",
       "type": "normal"
     },
     {
       "id": "e3",
+      "source": "lrn1",
+      "target": "pool1",
+      "type": "normal"
+    },
+    {
+      "id": "e4",
       "source": "pool1",
       "target": "conv2",
       "type": "normal"
     },
     {
-      "id": "e4",
-      "source": "conv2",
+      "id": "e5",
+      "source": "conv2_act",
+      "target": "lrn2",
+      "type": "normal"
+    },
+    {
+      "id": "e6",
+      "source": "lrn2",
       "target": "pool2",
       "type": "normal"
     },
     {
-      "id": "e5",
+      "id": "e7",
       "source": "pool2",
       "target": "conv3",
       "type": "normal"
     },
     {
-      "id": "e6",
-      "source": "conv3",
+      "id": "e8",
+      "source": "conv3_act",
       "target": "conv4",
       "type": "normal"
     },
     {
-      "id": "e7",
-      "source": "conv4",
+      "id": "e9",
+      "source": "conv4_act",
       "target": "conv5",
       "type": "normal"
     },
     {
-      "id": "e8",
-      "source": "conv5",
+      "id": "e10",
+      "source": "conv5_act",
       "target": "pool3",
       "type": "normal"
     },
     {
-      "id": "e9",
+      "id": "e11",
       "source": "pool3",
       "target": "flatten",
       "type": "normal"
     },
     {
-      "id": "e10",
+      "id": "e12",
       "source": "flatten",
       "target": "fc1",
       "type": "normal"
     },
     {
-      "id": "e11",
-      "source": "fc1",
+      "id": "e13",
+      "source": "fc1_act",
       "target": "dropout1",
       "type": "normal"
     },
     {
-      "id": "e12",
+      "id": "e14",
       "source": "dropout1",
       "target": "fc2",
       "type": "normal"
     },
     {
-      "id": "e13",
-      "source": "fc2",
+      "id": "e15",
+      "source": "fc2_act",
       "target": "dropout2",
       "type": "normal"
     },
     {
-      "id": "e14",
+      "id": "e16",
       "source": "dropout2",
       "target": "output",
+      "type": "normal"
+    },
+    {
+      "id": "conv1_to_conv1_act",
+      "source": "conv1",
+      "target": "conv1_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv2_to_conv2_act",
+      "source": "conv2",
+      "target": "conv2_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv3_to_conv3_act",
+      "source": "conv3",
+      "target": "conv3_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv4_to_conv4_act",
+      "source": "conv4",
+      "target": "conv4_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv5_to_conv5_act",
+      "source": "conv5",
+      "target": "conv5_act",
+      "type": "normal"
+    },
+    {
+      "id": "fc1_to_fc1_act",
+      "source": "fc1",
+      "target": "fc1_act",
+      "type": "normal"
+    },
+    {
+      "id": "fc2_to_fc2_act",
+      "source": "fc2",
+      "target": "fc2_act",
+      "type": "normal"
+    },
+    {
+      "id": "output_to_output_act",
+      "source": "output",
+      "target": "output_act",
       "type": "normal"
     }
   ]

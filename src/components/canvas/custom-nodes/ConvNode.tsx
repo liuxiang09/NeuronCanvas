@@ -2,7 +2,7 @@ import { memo } from "react"
 import { Handle, Position } from "reactflow"
 import { Layers } from "lucide-react"
 import type { Conv2DLayer } from "@/lib/types"
-import { getColorTheme } from "@/lib/utils"
+import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
 
 interface ConvNodeProps {
@@ -11,7 +11,7 @@ interface ConvNodeProps {
 }
 
 export const ConvNode = memo(({ data, selected }: ConvNodeProps) => {
-  const theme = getColorTheme(data.type)
+  const theme = getLayerColorTheme(data)
   
   return (
     <div
@@ -49,7 +49,7 @@ export const ConvNode = memo(({ data, selected }: ConvNodeProps) => {
         </div>
 
         {/* 参数信息 */}
-        {renderLayerFields(data, "purple")}
+        {renderLayerFields(data, theme)}
       </div>
 
       {/* 输出 Handle */}
@@ -58,11 +58,13 @@ export const ConvNode = memo(({ data, selected }: ConvNodeProps) => {
         position={Position.Right}
         className={`!w-3 !h-3 ${theme.handle} !border-2 !border-white`}
       />
-
-      {/* Hover 发光效果 */}
+      {/* 装饰性图标 */}
+      <div className="absolute bottom-2 right-2 opacity-5">
+        <Layers className={`w-12 h-12 ${theme.textHighlight}`} />
+      </div>
+      {/* 悬浮效果 */}
       <div className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />
     </div>
   )
 })
 
-ConvNode.displayName = "ConvNode"

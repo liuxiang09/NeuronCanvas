@@ -7,13 +7,11 @@
  * 3. 在 edgeComponents 对象中添加映射关系
  */
 
-export { default as NormalEdge } from './NormalEdge'
-export { ResidualEdge } from './ResidualEdge'
+export { default as NormalEdge } from "./NormalEdge"
 
 // 边组件映射 - 用于自动注册到 React Flow
-import NormalEdge from './NormalEdge'
-import { ResidualEdge } from './ResidualEdge'
-import type { EdgeTypes } from 'reactflow'
+import NormalEdge from "./NormalEdge"
+import type { EdgeTypes } from "reactflow"
 
 /**
  * 所有自定义边的映射
@@ -24,5 +22,4 @@ import type { EdgeTypes } from 'reactflow'
  */
 export const edgeComponents: EdgeTypes = {
   normal: NormalEdge,
-  residual: ResidualEdge,
 }

@@ -2,7 +2,7 @@ import { memo } from "react"
 import { Handle, Position } from "reactflow"
 import { Image } from "lucide-react"
 import type { InputLayer } from "@/lib/types"
-import { getColorTheme } from "@/lib/utils"
+import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
 
 interface InputNodeProps {
@@ -11,7 +11,7 @@ interface InputNodeProps {
 }
 
 export const InputNode = memo(({ data, selected }: InputNodeProps) => {
-  const theme = getColorTheme(data.type)
+  const theme = getLayerColorTheme(data)
   
   return (
     <div
@@ -42,7 +42,7 @@ export const InputNode = memo(({ data, selected }: InputNodeProps) => {
         </div>
 
         {/* 参数信息 */}
-        {renderLayerFields(data, "blue")}
+        {renderLayerFields(data, theme)}
       </div>
 
       {/* 输出 Handle (只有右侧) */}
@@ -51,11 +51,13 @@ export const InputNode = memo(({ data, selected }: InputNodeProps) => {
         position={Position.Right}
         className={`!w-3 !h-3 ${theme.handle} !border-2 !border-white`}
       />
-
+      {/* 装饰性图标 */}
+      <div className="absolute bottom-2 right-2 opacity-5">
+        <Image className={`w-12 h-12 ${theme.textHighlight}`} />
+      </div>
       {/* Hover 发光效果 */}
       <div className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />
     </div>
   )
 })
 
-InputNode.displayName = "InputNode"

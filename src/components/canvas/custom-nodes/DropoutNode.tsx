@@ -2,7 +2,7 @@ import { memo } from "react"
 import { Handle, Position } from "reactflow"
 import { Shield, Droplets } from "lucide-react"
 import type { DropoutLayer } from "@/lib/types"
-import { getColorTheme } from "@/lib/utils"
+import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
 
 interface DropoutNodeProps {
@@ -11,13 +11,13 @@ interface DropoutNodeProps {
 }
 
 export const DropoutNode = memo(({ data, selected }: DropoutNodeProps) => {
-  const theme = getColorTheme(data.type)
+  const theme = getLayerColorTheme(data)
   
   return (
     <div
       className={`
         relative group
-        w-[240px] min-h-[120px]
+        min-w-[240px] min-h-[120px]
         rounded-xl border-2 
         bg-background
         shadow-lg
@@ -49,7 +49,7 @@ export const DropoutNode = memo(({ data, selected }: DropoutNodeProps) => {
         </div>
 
         {/* 参数信息 */}
-        {renderLayerFields(data, "yellow")}
+        {renderLayerFields(data, theme)}
       </div>
 
       {/* 输出 Handle */}
@@ -61,10 +61,13 @@ export const DropoutNode = memo(({ data, selected }: DropoutNodeProps) => {
 
       {/* 装饰性图标 */}
       <div className="absolute bottom-2 right-2 opacity-5">
-        <Droplets className={`w-12 h-12 ${theme.textHighlight}`} />
+        <Shield className={`w-12 h-12 ${theme.textHighlight}`} />
       </div>
+      {/* 悬浮效果 */}
+      <div
+        className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`}
+      />
     </div>
   )
 })
 
-DropoutNode.displayName = "DropoutNode"

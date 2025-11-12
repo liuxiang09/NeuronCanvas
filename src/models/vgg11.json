@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "vgg11",
-    "displayName": "VGG-11(未验证)",
+    "displayName": "VGG-11",
     "description": "VGG-11 是 VGG 系列中层数最少的变体，包含 8 个卷积层和 3 个全连接层。相比 VGG-16 和 VGG-19，VGG-11 参数量更少，训练速度更快，适合资源受限的场景。",
     "year": 2014,
     "authors": ["Karen Simonyan", "Andrew Zisserman"],
@@ -9,7 +9,8 @@
     "paperTitle": "Very deep convolutional networks for large-scale image recognition",
     "citations": 108537,
     "tags": ["CNN", "图像分类", "深度网络"],
-    "category": "CNN"
+    "category": ["CNN"],
+    "verified": false
   },
   "layers": [
     {
@@ -17,7 +18,7 @@
       "name": "输入层",
       "type": "input",
       "description": "224×224 RGB 图像",
-      "shape": [224, 224, 3]
+      "shape": ["B", 3, 224, 224]
     },
     {
       "id": "conv1",
@@ -27,8 +28,15 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
+      "outputShape": ["B", 64, 224, 224]
+    },
+    {
+      "id": "conv1_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [224, 224, 64]
+      "inputShape": ["B", 64, 224, 224],
+      "outputShape": ["B", 64, 224, 224]
     },
     {
       "id": "pool1",
@@ -36,7 +44,7 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": [112, 112, 64]
+      "outputShape": ["B", 64, 112, 112]
     },
     {
       "id": "conv2",
@@ -46,8 +54,15 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
+      "outputShape": ["B", 128, 112, 112]
+    },
+    {
+      "id": "conv2_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [112, 112, 128]
+      "inputShape": ["B", 128, 112, 112],
+      "outputShape": ["B", 128, 112, 112]
     },
     {
       "id": "pool2",
@@ -55,7 +70,7 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": [56, 56, 128]
+      "outputShape": ["B", 128, 56, 56]
     },
     {
       "id": "conv3_1",
@@ -65,8 +80,15 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
+      "outputShape": ["B", 256, 56, 56]
+    },
+    {
+      "id": "conv3_1_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [56, 56, 256]
+      "inputShape": ["B", 256, 56, 56],
+      "outputShape": ["B", 256, 56, 56]
     },
     {
       "id": "conv3_2",
@@ -76,8 +98,15 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
+      "outputShape": ["B", 256, 56, 56]
+    },
+    {
+      "id": "conv3_2_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [56, 56, 256]
+      "inputShape": ["B", 256, 56, 56],
+      "outputShape": ["B", 256, 56, 56]
     },
     {
       "id": "pool3",
@@ -85,7 +114,7 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": [28, 28, 256]
+      "outputShape": ["B", 256, 28, 28]
     },
     {
       "id": "conv4_1",
@@ -95,8 +124,15 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
+      "outputShape": ["B", 512, 28, 28]
+    },
+    {
+      "id": "conv4_1_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [28, 28, 512]
+      "inputShape": ["B", 512, 28, 28],
+      "outputShape": ["B", 512, 28, 28]
     },
     {
       "id": "conv4_2",
@@ -106,8 +142,15 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
+      "outputShape": ["B", 512, 28, 28]
+    },
+    {
+      "id": "conv4_2_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [28, 28, 512]
+      "inputShape": ["B", 512, 28, 28],
+      "outputShape": ["B", 512, 28, 28]
     },
     {
       "id": "pool4",
@@ -115,7 +158,7 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": [14, 14, 512]
+      "outputShape": ["B", 512, 14, 14]
     },
     {
       "id": "conv5_1",
@@ -125,8 +168,15 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
+      "outputShape": ["B", 512, 14, 14]
+    },
+    {
+      "id": "conv5_1_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [14, 14, 512]
+      "inputShape": ["B", 512, 14, 14],
+      "outputShape": ["B", 512, 14, 14]
     },
     {
       "id": "conv5_2",
@@ -136,8 +186,15 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
+      "outputShape": ["B", 512, 14, 14]
+    },
+    {
+      "id": "conv5_2_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [14, 14, 512]
+      "inputShape": ["B", 512, 14, 14],
+      "outputShape": ["B", 512, 14, 14]
     },
     {
       "id": "pool5",
@@ -145,45 +202,71 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": [7, 7, 512]
+      "outputShape": ["B", 512, 7, 7]
     },
     {
       "id": "flatten",
       "name": "Flatten",
       "type": "flatten",
-      "outputShape": [25088]
+      "outputShape": ["B", 25088]
     },
     {
       "id": "fc1",
       "name": "FC 1",
-      "type": "dense",
+      "type": "linear",
       "units": 4096,
+      "outputShape": ["B", 4096]
+    },
+    {
+      "id": "fc1_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [4096]
+      "inputShape": ["B", 4096],
+      "outputShape": ["B", 4096]
     },
     {
       "id": "fc2",
       "name": "FC 2",
-      "type": "dense",
+      "type": "linear",
       "units": 4096,
+      "outputShape": ["B", 4096]
+    },
+    {
+      "id": "fc2_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [4096]
+      "inputShape": ["B", 4096],
+      "outputShape": ["B", 4096]
     },
     {
       "id": "fc3",
       "name": "FC 3",
-      "type": "dense",
+      "type": "linear",
       "units": 1000,
+      "outputShape": ["B", 1000]
+    },
+    {
+      "id": "fc3_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [1000]
+      "inputShape": ["B", 1000],
+      "outputShape": ["B", 1000]
     },
     {
       "id": "output",
       "name": "输出层",
-      "type": "output",
+      "type": "linear",
       "units": 1000,
-      "activation": "softmax",
       "outputType": "classification"
+    },
+    {
+      "id": "output_act",
+      "name": "Softmax 激活",
+      "type": "softmax",
+      "activation": "softmax"
     }
   ],
   "edges": [
@@ -195,7 +278,7 @@
     },
     {
       "id": "e2",
-      "source": "conv1",
+      "source": "conv1_act",
       "target": "pool1",
       "type": "normal"
     },
@@ -207,7 +290,7 @@
     },
     {
       "id": "e4",
-      "source": "conv2",
+      "source": "conv2_act",
       "target": "pool2",
       "type": "normal"
     },
@@ -219,13 +302,13 @@
     },
     {
       "id": "e6",
-      "source": "conv3_1",
+      "source": "conv3_1_act",
       "target": "conv3_2",
       "type": "normal"
     },
     {
       "id": "e7",
-      "source": "conv3_2",
+      "source": "conv3_2_act",
       "target": "pool3",
       "type": "normal"
     },
@@ -237,13 +320,13 @@
     },
     {
       "id": "e9",
-      "source": "conv4_1",
+      "source": "conv4_1_act",
       "target": "conv4_2",
       "type": "normal"
     },
     {
       "id": "e10",
-      "source": "conv4_2",
+      "source": "conv4_2_act",
       "target": "pool4",
       "type": "normal"
     },
@@ -255,13 +338,13 @@
     },
     {
       "id": "e12",
-      "source": "conv5_1",
+      "source": "conv5_1_act",
       "target": "conv5_2",
       "type": "normal"
     },
     {
       "id": "e13",
-      "source": "conv5_2",
+      "source": "conv5_2_act",
       "target": "pool5",
       "type": "normal"
     },
@@ -279,20 +362,92 @@
     },
     {
       "id": "e16",
-      "source": "fc1",
+      "source": "fc1_act",
       "target": "fc2",
       "type": "normal"
     },
     {
       "id": "e17",
-      "source": "fc2",
+      "source": "fc2_act",
       "target": "fc3",
       "type": "normal"
     },
     {
       "id": "e18",
-      "source": "fc3",
+      "source": "fc3_act",
       "target": "output",
+      "type": "normal"
+    },
+    {
+      "id": "conv1_to_conv1_act",
+      "source": "conv1",
+      "target": "conv1_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv2_to_conv2_act",
+      "source": "conv2",
+      "target": "conv2_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv3_1_to_conv3_1_act",
+      "source": "conv3_1",
+      "target": "conv3_1_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv3_2_to_conv3_2_act",
+      "source": "conv3_2",
+      "target": "conv3_2_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv4_1_to_conv4_1_act",
+      "source": "conv4_1",
+      "target": "conv4_1_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv4_2_to_conv4_2_act",
+      "source": "conv4_2",
+      "target": "conv4_2_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv5_1_to_conv5_1_act",
+      "source": "conv5_1",
+      "target": "conv5_1_act",
+      "type": "normal"
+    },
+    {
+      "id": "conv5_2_to_conv5_2_act",
+      "source": "conv5_2",
+      "target": "conv5_2_act",
+      "type": "normal"
+    },
+    {
+      "id": "fc1_to_fc1_act",
+      "source": "fc1",
+      "target": "fc1_act",
+      "type": "normal"
+    },
+    {
+      "id": "fc2_to_fc2_act",
+      "source": "fc2",
+      "target": "fc2_act",
+      "type": "normal"
+    },
+    {
+      "id": "fc3_to_fc3_act",
+      "source": "fc3",
+      "target": "fc3_act",
+      "type": "normal"
+    },
+    {
+      "id": "output_to_output_act",
+      "source": "output",
+      "target": "output_act",
       "type": "normal"
     }
   ]

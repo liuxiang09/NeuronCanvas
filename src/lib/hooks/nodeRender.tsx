@@ -1,96 +1,52 @@
-import { getFieldLabel, getFieldOrder, getValueLabel } from "../fieldMapping"
-import { formatShape} from "../utils"
+import { getFieldLabel, getFieldOrder, formatFieldValue } from "../fieldMapping"
+import type { Layer } from "../types"
+import type { LayerColorTheme } from "../theme"
 
 /**
- * 需要使用高亮色显示的字段列表
+ * 需要高亮显示的字段（使用层的主题色）
  */
 const HIGHLIGHT_FIELDS = ["outputShape", "shape"]
+
+/**
+ * 需要顶部边框的字段（用于视觉分隔）
+ */
 const BORDER_FIELDS = ["outputShape", "shape"]
-/**
- * 格式化字段值以便显示
- */
-export function formatFieldValue(key: string, value: any): string {
-  if (value === undefined || value === null) {
-    return ""
-  }
-
-  // 首先检查是否有预定义的值映射
-  const mappedValue = getValueLabel(key, value)
-  if (mappedValue) {
-    return mappedValue
-  }
-
-  // 处理数组
-  if (Array.isArray(value)) {
-    // 检查是否是形状数组（数字数组）
-    if (value.every((v) => typeof v === "number")) {
-      // 如果是2D/3D大小
-      if (value.length === 2 || value.length === 3) {
-        return value.join("×")
-      }
-      // 如果是输出形状
-      return formatShape(value)
-    }
-    // 其他数组
-    return value.join(", ")
-  }
-
-  // 处理布尔值
-  if (typeof value === "boolean") {
-    return value ? "是" : "否"
-  }
-
-  // 处理数字
-  if (typeof value === "number") {
-    // 如果是dropout或rate相关的小数，转换为百分比
-    if ((key === "rate" || key === "dropout") && value < 1) {
-      return `${(value * 100).toFixed(0)}%`
-    }
-    // 直接返回数字,不进行格式化
-    return value.toString()
-  }
-
-  // 处理字符串
-  if (typeof value === "string") {
-    // 激活函数保持原样(不转大写)
-    if (key === "activation") {
-      return value
-    }
-    // padding等保持原样或首字母大写
-    return value.charAt(0).toUpperCase() + value.slice(1)
-  }
-
-  return String(value)
-}
 
 /**
- * 渲染字段列表
+ * 渲染层的参数字段（用于节点卡片显示）
+ * @param layer 层对象
+ * @param theme 层的颜色主题
+ * @returns JSX 元素
  */
-export function renderLayerFields(
-  data: any,
-  highlightColor: string = "purple"
-) {
-  const fieldOrder = getFieldOrder(data.type)
+export function renderLayerFields(layer: Layer, theme: LayerColorTheme) {
+  // 获取该层类型应该显示的字段顺序
+  const fieldOrder = getFieldOrder(layer.type)
 
   return (
     <div className="space-y-1.5">
       {fieldOrder.map((fieldKey) => {
-        const value = data[fieldKey]
+        // 从 layer 对象中获取字段值
+        const value = (layer as any)[fieldKey]
         
-        // 跳过undefined/null值和description字段
+        // 跳过空值和描述字段
         if (value === undefined || value === null || fieldKey === "description") {
           return null
         }
 
+        // 获取字段的显示标签和格式化值
         const label = getFieldLabel(fieldKey)
-        const formattedValue = formatFieldValue(fieldKey, value)
+        let formattedValue = formatFieldValue(fieldKey, value)
 
-        // 如果格式化后的值为空，跳过
+        if (fieldKey === "outputShape" || fieldKey === "inputShape") {
+          formattedValue = `\t${formattedValue}`
+        }
+
+        // 跳过格式化后为空的值
         if (!formattedValue) {
           return null
         }
 
-        // 检查是否需要高亮显示
+        // 判断是否需要特殊样式
         const isHighlight = HIGHLIGHT_FIELDS.includes(fieldKey)
         const needsBorder = BORDER_FIELDS.includes(fieldKey)
 
@@ -103,11 +59,11 @@ export function renderLayerFields(
           >
             <span className="text-muted-foreground">{label}:</span>
             <span
-              className={
+              className={`whitespace-pre ${
                 isHighlight
-                  ? `font-semibold text-${highlightColor}-600`
+                  ? `font-semibold ${theme.textHighlight}`
                   : "font-medium text-foreground"
-              }
+              }`}
             >
               {formattedValue}
             </span>

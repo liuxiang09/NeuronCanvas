@@ -1,23 +1,23 @@
 import { memo } from "react"
 import { Handle, Position } from "reactflow"
-import { Target } from "lucide-react"
-import type { OutputLayer } from "@/lib/types"
-import { getColorTheme } from "@/lib/utils"
+import { Network } from "lucide-react"
+import type { LinearLayer } from "@/lib/types"
+import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
 
-interface OutputNodeProps {
-  data: OutputLayer
+interface LinearNodeProps {
+  data: LinearLayer
   selected?: boolean
 }
 
-export const OutputNode = memo(({ data, selected }: OutputNodeProps) => {
-  const theme = getColorTheme(data.type)
-  
+export const LinearNode = memo(({ data, selected }: LinearNodeProps) => {
+  const theme = getLayerColorTheme(data)
+
   return (
     <div
       className={`
         relative group
-        w-[240px] min-h-[120px]
+        min-w-[240px] min-h-[120px]
         rounded-xl border-2 
         bg-background
         shadow-lg
@@ -25,7 +25,7 @@ export const OutputNode = memo(({ data, selected }: OutputNodeProps) => {
         ${selected ? theme.borderSelected : theme.borderUnselected}
       `}
     >
-      {/* 输入 Handle (只有左侧) */}
+      {/* 输入 Handle */}
       <Handle
         type="target"
         position={Position.Left}
@@ -40,7 +40,7 @@ export const OutputNode = memo(({ data, selected }: OutputNodeProps) => {
         {/* 标题区 */}
         <div className="flex items-center gap-2 mb-3">
           <div className={`p-1.5 rounded-lg ${theme.background}`}>
-            <Target className={`w-4 h-4 ${theme.textHighlight}`} />
+            <Network className={`w-4 h-4 ${theme.textHighlight}`} />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm truncate">{data.name}</h3>
@@ -49,13 +49,25 @@ export const OutputNode = memo(({ data, selected }: OutputNodeProps) => {
         </div>
 
         {/* 参数信息 */}
-        {renderLayerFields(data, "red")}
+        {renderLayerFields(data, theme)}
       </div>
 
-      {/* Hover 发光效果 */}
-      <div className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />
+      {/* 输出 Handle */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        className={`!w-3 !h-3 ${theme.handle} !border-2 !border-white`}
+      />
+      {/* 装饰性图标 */}
+      <div className="absolute bottom-2 right-2 opacity-5">
+        <Network className={`w-12 h-12 ${theme.textHighlight}`} />
+      </div>
+      {/* 悬浮效果 */}
+      <div
+        className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`}
+      />
     </div>
   )
 })
 
-OutputNode.displayName = "OutputNode"
+

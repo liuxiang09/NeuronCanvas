@@ -20,8 +20,10 @@ import { Button } from "@/components/ui/button"
 import { useAppStore } from "@/lib/store"
 
 // 导入节点和边的映射配置
-import { nodeComponents, nodeColorMap } from "./custom-nodes"
+import { nodeComponents } from "./custom-nodes"
 import { edgeComponents } from "./custom-edges"
+import { getLayerColorTheme } from "@/lib/theme"
+import type { Layer } from "@/lib/types"
 
 interface ModelCanvasProps {
   nodes: Node[]
@@ -45,10 +47,12 @@ function ModelCanvasInner({
   // React Flow 状态管理
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
-  const { zoomIn, zoomOut, fitView } = useReactFlow()
+  const reactFlowInstance = useReactFlow()
+  const { zoomIn, zoomOut, fitView, getViewport } = reactFlowInstance
 
   // Zustand 状态
   const setZoomLevel = useAppStore((state) => state.setZoomLevel)
+  const zoomLevel = useAppStore((state) => state.zoomLevel)
   const canvasActionsRef = useAppStore((state) => state.canvasActionsRef)
   const isSidebarOpen = useAppStore((state) => state.isSidebarOpen)
   const setSelectedNode = useAppStore((state) => state.setSelectedNode)
@@ -75,6 +79,13 @@ function ModelCanvasInner({
     }
   }, [handleZoomIn, handleZoomOut, handleFitView, canvasActionsRef])
 
+  useEffect(() => {
+    const viewport = getViewport?.()
+    if (viewport?.zoom) {
+      setZoomLevel(viewport.zoom)
+    }
+  }, [getViewport, setZoomLevel])
+
   // 自动注册所有节点类型 - 从 nodeComponents 导入
   const nodeTypes = useMemo(() => nodeComponents, [])
 
@@ -96,13 +107,35 @@ function ModelCanvasInner({
 
   // MiniMap 节点颜色映射 - 从 nodeColorMap 导入
   const nodeColor = useCallback((node: Node) => {
-    return nodeColorMap[node.type || ""] || "#6b7280" // gray-500 fallback
+    const layer = node.data as Layer | undefined
+    if (layer && typeof layer === "object" && "type" in layer) {
+      const theme = getLayerColorTheme(layer)
+      if (theme?.miniMapColor) {
+        return theme.miniMapColor
+      }
+    }
+    return "#6b7280" // gray-500 fallback
   }, [])
 
   // 监听缩放变化
   const handleMoveEnd = useCallback((_event: any, viewport: any) => {
     setZoomLevel(viewport.zoom)
   }, [setZoomLevel])
+
+  const miniMapOffsetScale = useMemo(() => {
+    const scale = 0.1 * zoomLevel
+    return Math.max(0.04, Math.min(0.25, scale))
+  }, [zoomLevel])
+
+  const floatingPanelRight = useMemo(() => {
+    if (!isSidebarOpen) {
+      return "16px"
+    }
+
+    const SIDEBAR_WIDTH = "26rem"
+    const GAP_PX = 24
+    return `calc(${SIDEBAR_WIDTH} + ${GAP_PX}px)`
+  }, [isSidebarOpen])
 
   return (
     <div className={`relative w-full h-full ${className}`}>
@@ -149,6 +182,11 @@ function ModelCanvasInner({
           className="!bg-[#fefbf6] !border-[#d4c4a8] !shadow-lg"
           maskColor="rgba(250, 245, 238, 0.8)"
           position="bottom-left"
+          style={{ width: 220, height: 160, borderRadius: 12 }}
+          pannable
+          zoomable
+          zoomStep={0.2}
+          offsetScale={miniMapOffsetScale}
         />
 
         {/* 提示面板 */}
@@ -171,7 +209,7 @@ function ModelCanvasInner({
           position="top-right" 
           className="flex flex-col gap-2"
           style={{
-            right: isSidebarOpen ? '320px' : '10px',
+            right: floatingPanelRight,
             transition: 'right 0.3s ease-in-out'
           }}
         >
@@ -209,7 +247,7 @@ function ModelCanvasInner({
           position="bottom-right" 
           className="bg-gradient-to-br from-primary/10 to-purple-500/10 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg"
           style={{
-            right: isSidebarOpen ? '320px' : '10px',
+            right: floatingPanelRight,
             transition: 'right 0.3s ease-in-out'
           }}
         >

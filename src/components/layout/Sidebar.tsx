@@ -1,12 +1,12 @@
 "use client"
 
-import { X, Layers, Info, Image, Droplets, Maximize2, Network, Target, Plus, Grid3x3, Package } from "lucide-react"
+import { X, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { KeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts"
-import type { Layer, StemLayer } from "@/lib/types"
-import { getColorTheme, getLayerColorTheme } from "@/lib/utils"
-import { getFieldLabel, getFieldOrder, getValueLabel } from "@/lib/fieldMapping"
-import { formatFieldValue } from "@/lib/hooks/nodeRender"
+import type { Layer, SequentialLayer, ParallelLayer } from "@/lib/types"
+import { getLayerColorTheme } from "@/lib/theme"
+import { getLayerIcon, getLayerParams } from "@/lib/fieldMapping"
+import { formatFieldValue } from "@/lib/fieldMapping"
 
 interface SidebarProps {
   isOpen: boolean
@@ -14,80 +14,9 @@ interface SidebarProps {
   selectedNode?: Layer | null
 }
 
-// 获取层类型图标
-function getLayerIcon(type: string) {
-  const iconMap: Record<string, any> = {
-    input: Image,
-    conv2d: Layers,
-    conv3d: Layers,
-    maxpool2d: Droplets,
-    avgpool2d: Droplets,
-    maxpool3d: Droplets,
-    avgpool3d: Droplets,
-    global_avgpool: Droplets,
-    global_maxpool: Droplets,
-    adaptive_avgpool: Droplets,
-    adaptive_maxpool: Droplets,
-    flatten: Maximize2,
-    dense: Network,
-    dropout: Grid3x3,
-    batchnorm: Layers,
-    batchnorm2d: Layers,
-    batchnorm3d: Layers,
-    layernorm: Layers,
-    groupnorm: Layers,
-    instancenorm: Layers,
-    stem: Package,
-    add: Plus,
-    concat: Plus,
-    multiply: Plus,
-    output: Target,
-  }
-  return iconMap[type]
-}
-
-// 提取层的参数信息（使用与 Node 相同的逻辑）
-function extractLayerParams(layer: Layer): Array<{ label: string; value: string; isHighlight?: boolean }> {
-  const params: Array<{ label: string; value: string; isHighlight?: boolean }> = []
-  const fieldOrder = getFieldOrder(layer.type)
-  const anyLayer = layer as any
-  
-  // 高亮字段列表（只有输出形状和输入形状使用当前层配色）
-  const HIGHLIGHT_FIELDS = ["outputShape", "shape"]
-
-  for (const fieldKey of fieldOrder) {
-    const value = anyLayer[fieldKey]
-    
-    // 跳过 undefined/null 值
-    if (value === undefined || value === null) {
-      continue
-    }
-
-    const label = getFieldLabel(fieldKey)
-    const formattedValue = formatFieldValue(fieldKey, value)
-
-    // 如果格式化后的值为空，跳过
-    if (!formattedValue) {
-      continue
-    }
-
-    // 检查是否需要高亮显示
-    const isHighlight = HIGHLIGHT_FIELDS.includes(fieldKey)
-
-    params.push({ 
-      label, 
-      value: formattedValue, 
-      isHighlight 
-    })
-  }
-
-  return params
-}
-
-
 export function Sidebar({ isOpen, onClose, selectedNode }: SidebarProps) {
   const Icon = selectedNode ? getLayerIcon(selectedNode.type) : Info
-  const params = selectedNode ? extractLayerParams(selectedNode) : []
+  const params = selectedNode ? getLayerParams(selectedNode) : []
   const theme = selectedNode ? getLayerColorTheme(selectedNode) : null
   return (
     <>
@@ -102,20 +31,21 @@ export function Sidebar({ isOpen, onClose, selectedNode }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-16 right-0 h-[calc(100vh-4rem)] w-80 bg-background border-l border-border
+          fixed top-16 right-0 h-[calc(100vh-4rem)] bg-background border-l border-border
           transform transition-transform duration-300 ease-in-out z-50
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
           lg:fixed lg:top-16
         `}
+        style={{ width: "26rem", minWidth: "20rem", maxWidth: "40rem" }}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex items-center gap-2">
-              <div className={`p-2 rounded-lg ${theme?.background}/10`}>
-                <Icon className={`h-4 w-4`} />
+              <div className={`p-2 rounded-lg ${theme?.background || 'bg-gray-500/10'}`}>
+                <Icon className={`h-4 w-4 ${theme?.textHighlight || 'text-gray-500'}`} />
               </div>
-              <h2 className={`font-semibold text-lg ${theme?.textHighlight}`}>
+              <h2 className={`font-semibold text-lg ${theme?.textHighlight || 'text-foreground'}`}>
                 {selectedNode ? '层详情' : '等待选择'}
               </h2>
             </div>
@@ -145,9 +75,10 @@ export function Sidebar({ isOpen, onClose, selectedNode }: SidebarProps) {
                 {/* 层名称和类型 */}
                 <div>
                   <h3 className="text-xl font-bold mb-1">{selectedNode.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    type: <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">{selectedNode.type}</code>
-                  </p>
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <span>类型:</span>
+                    <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">{selectedNode.type}</code>
+                  </div>
                 </div>
 
                 {/* 渐变分隔线 */}
@@ -174,7 +105,6 @@ export function Sidebar({ isOpen, onClose, selectedNode }: SidebarProps) {
                           label={param.label} 
                           value={param.value} 
                           isHighlight={param.isHighlight}
-                          layerType={selectedNode.type}
                           layer={selectedNode}
                         />
                       ))}
@@ -182,13 +112,19 @@ export function Sidebar({ isOpen, onClose, selectedNode }: SidebarProps) {
                   </div>
                 )}
 
-                {/* Stem 层的详细结构 */}
-                {selectedNode.type === "stem" && (selectedNode as StemLayer).steps && (
+                {/* Sequential 层的详细结构 */}
+                {selectedNode.type === "sequential" && (selectedNode as SequentialLayer).steps && (
                   <div>
-                    <h4 className="text-sm font-semibold mb-3">包含的子层</h4>
-                    <StemLayerStructure 
-                      layer={selectedNode as StemLayer}
+                    <h4 className="text-sm font-semibold mb-3">线性结构</h4>
+                    <SequentialLayerStructure 
+                      layer={selectedNode as SequentialLayer}
                     />
+                  </div>
+                )}
+                {selectedNode.type === "parallel" && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-3">并行分支</h4>
+                    <ParallelLayerStructure layer={selectedNode as ParallelLayer} />
                   </div>
                 )}
               </div>
@@ -205,53 +141,67 @@ export function Sidebar({ isOpen, onClose, selectedNode }: SidebarProps) {
   )
 }
 
-// 参数行组件（与 Node 样式保持一致）
+// ============================================================================
+// Sidebar 内部组件
+// ============================================================================
+
+/**
+ * 参数行组件（与 Node 样式保持一致）
+ */
 function ParamRow({ 
   label, 
   value, 
   isHighlight = false,
-  layerType,
-  layer
+  layer,
 }: { 
   label: string
   value: string
   isHighlight?: boolean
-  layerType: string
   layer: Layer
 }) {
-  // 使用 getLayerColorTheme 正确处理 stem 层的自定义颜色
-  const highlightColor = isHighlight ? getLayerColorTheme(layer).textHighlight : 'text-foreground'
+  const highlightColor = isHighlight ? getLayerColorTheme(layer).textHighlight : "text-foreground"
+
+  const shapeParts = value.split("|").map((part) => part.trim()).filter(Boolean)
+  const isShapeValue = label.includes("形状") && (value.includes("×") || value.includes("|"))
+  const parts = value.split("|").map((part) => part.trim()).filter(Boolean)
   
   return (
-    <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-muted/50">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className={`text-sm font-semibold ${highlightColor}`}>
-        {value}
-      </span> 
+    <div className="py-2 px-3 rounded-lg bg-muted/50 space-y-1.5">
+      <div className="text-sm text-muted-foreground">{label}</div>
+      <div
+        className={`text-base font-semibold ${
+          isHighlight ? highlightColor : "text-foreground"
+        } ${isShapeValue ? "font-mono" : ""} text-right leading-relaxed space-y-1`}
+      >
+        {isShapeValue
+          ? shapeParts.map((part, index) => <div key={index}>{part}</div>)
+          : value}
+      </div>
     </div>
   )
 }
 
-// Stem 层结构展示组件
-function StemLayerStructure({ 
+/**
+ * Sequential 层结构展示组件
+ */
+function SequentialLayerStructure({ 
   layer
 }: { 
-  layer: StemLayer
+  layer: SequentialLayer
 }) {
   const steps = layer.steps || []
-  // 使用统一的颜色配置（支持自定义颜色）
   const theme = getLayerColorTheme(layer)
 
   return (
     <div className="border border-border rounded-lg overflow-hidden">
       <div className={`bg-gradient-to-r ${theme.head} px-3 py-2 border-b ${theme.border}`}>
-        <span className={`text-sm font-semibold ${theme.textHighlight}`}>
+        <span className={`text-sm font-semibold text-white`}>
           {steps.length} 个步骤
         </span>
       </div>
       <div className="p-3 space-y-3 bg-muted/30">
         {steps.map((subLayer: Layer, index: number) => (
-          <StemLayerItem 
+          <SequentialLayerItem 
             key={index}
             layer={subLayer} 
             index={index}
@@ -262,16 +212,92 @@ function StemLayerStructure({
   )
 }
 
-// Stem 子层项目组件
-function StemLayerItem({ 
+/**
+ * 并行节点结构展示
+ */
+function ParallelLayerStructure({
+  layer,
+}: {
+  layer: ParallelLayer
+}) {
+  const branches = layer.branches || []
+  const theme = getLayerColorTheme(layer)
+
+  if (branches.length === 0) {
+    return (
+      <div className="text-sm text-muted-foreground">
+        未提供并行分支信息
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      {branches.map((branch, branchIndex) => {
+        const branchTheme = branch.color
+          ? getLayerColorTheme({
+              ...layer,
+              type: "parallel",
+              color: branch.color,
+            } as any)
+          : theme
+
+        const branchOutput =
+          branch.outputShape ??
+          (Array.isArray(layer.outputShape) ? layer.outputShape[branchIndex] : undefined)
+
+        return (
+          <div
+            key={branch.id || branchIndex}
+            className="border border-border rounded-lg overflow-hidden"
+          >
+            <div className={`px-3 py-2 bg-gradient-to-r ${branchTheme.head}`}>
+              <div className="flex items-center justify-between text-white text-sm font-semibold">
+                <span>
+                  {branch.name || `分支 ${branchIndex + 1}`}
+                </span>
+                {branchOutput && (
+                  <span className="text-xs opacity-80">
+                    {formatFieldValue("outputShape", branchOutput)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {branch.steps && branch.steps.length > 0 ? (
+              <div className="p-3 space-y-3 bg-muted/30">
+                {branch.steps.map((step: Layer, idx: number) => (
+                  <SequentialLayerItem
+                    key={step.id || `${branchIndex}-${idx}`}
+                    layer={step}
+                    index={idx}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="p-3 text-xs text-muted-foreground bg-muted/30">
+                此分支未定义具体步骤
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/**
+ * Sequential 子层项目组件
+ */
+function SequentialLayerItem({ 
   layer, 
   index
 }: { 
   layer: Layer
   index: number
 }) {
-  const params = extractLayerParams(layer)
-  const layerTheme = getColorTheme(layer.type)
+  const params = getLayerParams(layer)
+  const layerTheme = getLayerColorTheme(layer)
   const Icon = getLayerIcon(layer.type)
 
   return (
@@ -295,7 +321,7 @@ function StemLayerItem({
           {params.map((param, idx) => (
             <div key={idx} className="flex justify-between text-xs">
               <span className="text-muted-foreground">{param.label}:</span>
-              <span className={`font-semibold ${param.isHighlight ? getColorTheme(layer.type).textHighlight : 'text-foreground'}`}>
+              <span className={`font-semibold ${param.isHighlight ? layerTheme.textHighlight : 'text-foreground'}`}>
                 {param.value}
               </span>
             </div>
