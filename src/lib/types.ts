@@ -11,6 +11,9 @@ export type ActivationType = "relu" | "sigmoid" | "tanh" | "softmax";
 /** 归一化层类型 */
 export type NormType = "batchnorm" | "layernorm" | "lrn";
 
+/** 注意力类型 */
+export type AttentionType = "self-attention" | "cross-attention";
+
 /**
  * 节点类型枚举
  *
@@ -19,12 +22,14 @@ export type NormType = "batchnorm" | "layernorm" | "lrn";
  */
 export type LayerType =
   | "input"
+  | "embedding"
   | "flatten"
   | "linear"
   | "conv2d"
   | "maxpool2d"
   | "avgpool2d"
   | "adaptiveavgpool2d"
+  | AttentionType
   | NormType
   | ActivationType
   | "dropout"
@@ -94,6 +99,12 @@ export interface LinearLayer extends LayerBase {
   type: "linear";
 }
 
+/** 嵌入层 */
+export interface EmbeddingLayer extends LayerBase {
+  type: "embedding";
+  dimension: number;
+}
+
 /** Dropout 层 */
 export interface DropoutLayer extends LayerBase {
   type: "dropout";
@@ -107,18 +118,19 @@ export interface DropoutLayer extends LayerBase {
  */
 export interface NormLayer extends LayerBase {
   type: NormType;
-  normType?: string;
-  momentum?: number;
-  epsilon?: number;
-  numFeatures?: number;
-  alpha?: number;
-  beta?: number;
-  k?: number;
 }
 
 /** 激活层 */
 export interface ActivationLayer extends LayerBase {
   type: ActivationType;
+}
+
+export interface AttentionLayer extends LayerBase {
+  type: AttentionType;
+  numHeads: number;
+  headDim: number;
+  modelDim: number;
+  usesMask?: boolean;
 }
 
 /** 加法层（用于残差连接） */
@@ -157,6 +169,7 @@ export interface ParallelLayer extends LayerBase {
 /** 所有节点类型的联合类型 */
 export type Layer =
   | InputLayer
+  | EmbeddingLayer
   | FlattenLayer
   | LinearLayer
   | Conv2DLayer
@@ -165,6 +178,7 @@ export type Layer =
   | AdaptiveAvgPool2DLayer
   | NormLayer
   | DropoutLayer
+  | AttentionLayer
   | AddLayer
   | ConcatLayer
   | ActivationLayer
@@ -179,6 +193,8 @@ export interface Edge {
   label?: string;
   animated?: boolean;
   type?: string;
+  sourceHandle?: string;
+  targetHandle?: string;
 }
 
 /** 模型元数据 */

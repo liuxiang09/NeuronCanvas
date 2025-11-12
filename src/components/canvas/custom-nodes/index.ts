@@ -14,12 +14,14 @@ export { InputNode } from "./InputNode"
 export { ConvNode } from "./ConvNode"
 export { PoolingNode } from "./PoolingNode"
 export { LinearNode } from "./LinearNode"
+export { EmbeddingNode } from "./EmbeddingNode"
 export { DropoutNode } from "./DropoutNode"
 export { NormNode } from "./NormNode"
 export { ActivationNode } from "./ActivationNode"
 export { SequentialNode } from "./SequentialNode"
 export { ParallelNode } from "./ParallelNode"
 export { CalculateNode } from "./CalculateNode"
+export { AttentionNode } from "./AttentionNode"
 
 // 节点组件映射 - 用于自动注册到 React Flow
 // key: React Flow 节点类型名 (对应 layout.getNodeTypeMap 的输出)
@@ -28,12 +30,14 @@ import { InputNode } from "./InputNode"
 import { ConvNode } from "./ConvNode"
 import { PoolingNode } from "./PoolingNode"
 import { LinearNode } from "./LinearNode"
+import { EmbeddingNode } from "./EmbeddingNode"
 import { DropoutNode } from "./DropoutNode"
 import { NormNode } from "./NormNode"
 import { ActivationNode } from "./ActivationNode"
 import { SequentialNode } from "./SequentialNode"
 import { ParallelNode } from "./ParallelNode"
 import { CalculateNode } from "./CalculateNode"
+import { AttentionNode } from "./AttentionNode"
 import type { NodeTypes } from "reactflow"
 
 /**
@@ -45,11 +49,13 @@ export const nodeComponents: NodeTypes = {
   convNode: ConvNode,
   poolingNode: PoolingNode,
   linearNode: LinearNode,
+  embeddingNode: EmbeddingNode,
   dropoutNode: DropoutNode,
   normNode: NormNode,
   activationNode: ActivationNode,
   sequentialNode: SequentialNode,
   parallelNode: ParallelNode,
   calculateNode: CalculateNode,
+  attentionNode: AttentionNode,
 }
 

@@ -10,8 +10,10 @@ import {
   GitMerge,
   Zap,
   GitBranch,
-} from "lucide-react"
-import type { Layer } from "./types"
+  Target,
+  BookOpen,
+} from "lucide-react";
+import type { Layer } from "./types";
 
 const FIELD_LABEL_MAP: Record<string, string> = {
   shape: "输入形状",
@@ -30,19 +32,23 @@ const FIELD_LABEL_MAP: Record<string, string> = {
   numFeatures: "特征数量",
   inputShapes: "输入形状列表",
   normType: "归一化类型",
-  alpha: "α",
-  beta: "β",
-  k: "k",
   type: "类型",
-}
+  dimension: "嵌入维度",
+  numHeads: "注意力头数",
+  headDim: "单头维度",
+  modelDim: "模型维度",
+  dropout: "Dropout",
+  usesMask: "使用掩码",
+};
 
-const FIELD_ORDER_MAP: Record<string, string[]> = {
+export const FIELD_ORDER_MAP: Record<string, string[]> = {
   input: ["shape"],
   conv2d: ["filters", "kernelSize", "stride", "padding", "outputShape"],
   maxpool2d: ["poolSize", "stride", "padding", "outputShape"],
   avgpool2d: ["poolSize", "stride", "padding", "outputShape"],
   adaptiveavgpool2d: ["outputShape"],
   linear: ["outputShape"],
+  embedding: ["dimension", "outputShape"],
   dropout: ["rate", "outputShape"],
   batchnorm: ["outputShape"],
   layernorm: ["outputShape"],
@@ -56,9 +62,11 @@ const FIELD_ORDER_MAP: Record<string, string[]> = {
   concat: ["outputShape"],
   sequential: ["inputShape", "outputShape"],
   parallel: ["inputShape", "outputShape"],
-}
+  "self-attention": ["numHeads", "headDim", "modelDim", "usesMask", "outputShape"],
+  "cross-attention": ["numHeads", "headDim", "modelDim", "outputShape"],
+};
 
-const ICON_MAP: Record<string, any> = {
+export const ICON_MAP: Record<string, any> = {
   input: Image,
   conv2d: Layers,
   maxpool2d: Droplets,
@@ -66,6 +74,7 @@ const ICON_MAP: Record<string, any> = {
   adaptiveavgpool2d: Droplets,
   flatten: Maximize2,
   linear: Network,
+  embedding: BookOpen,
   dropout: Grid3x3,
   batchnorm: Layers,
   batchnorm2d: Layers,
@@ -79,99 +88,100 @@ const ICON_MAP: Record<string, any> = {
   concat: GitMerge,
   sequential: Package,
   parallel: GitBranch,
-}
+  "self-attention": Target,
+  "cross-attention": Target,
+};
 
-const HIGHLIGHT_FIELDS = ["outputShape", "shape"]
+const HIGHLIGHT_FIELDS = ["outputShape", "shape"];
 
 export function getFieldLabel(fieldName: string): string {
-  return FIELD_LABEL_MAP[fieldName] || fieldName
+  return FIELD_LABEL_MAP[fieldName] || fieldName;
 }
 
 export function getFieldOrder(layerType: string): string[] {
-  return FIELD_ORDER_MAP[layerType] || []
+  return FIELD_ORDER_MAP[layerType] || [];
 }
 
 export function getLayerIcon(type: string) {
-  return ICON_MAP[type] || Layers
+  return ICON_MAP[type] || Layers;
 }
 
-export function getLayerParams(layer: Layer): Array<{ 
-  label: string
-  value: string
-  isHighlight?: boolean 
+export function getLayerParams(layer: Layer): Array<{
+  label: string;
+  value: string;
+  isHighlight?: boolean;
 }> {
-  const params: Array<{ label: string; value: string; isHighlight?: boolean }> = []
-  const fieldOrder = getFieldOrder(layer.type)
-  const anyLayer = layer as any
+  const params: Array<{ label: string; value: string; isHighlight?: boolean }> =
+    [];
+  const fieldOrder = getFieldOrder(layer.type);
+  const anyLayer = layer as any;
 
   for (const fieldKey of fieldOrder) {
-    let value = anyLayer[fieldKey]
+    let value = anyLayer[fieldKey];
     if (value === undefined || value === null) {
       if (fieldKey === "type" && "type" in anyLayer) {
-        value = anyLayer.type
+        value = anyLayer.type;
       } else {
-      continue
+        continue;
       }
     }
 
-    const label = getFieldLabel(fieldKey)
-    const formattedValue = formatFieldValue(fieldKey, value)
+    const label = getFieldLabel(fieldKey);
+    const formattedValue = formatFieldValue(fieldKey, value);
     if (!formattedValue) {
-      continue
+      continue;
     }
 
-    const isHighlight = HIGHLIGHT_FIELDS.includes(fieldKey)
+    const isHighlight = HIGHLIGHT_FIELDS.includes(fieldKey);
 
     params.push({
       label,
       value: formattedValue,
       isHighlight,
-    })
+    });
   }
 
   if (layer.type === "parallel") {
-    const branches = (layer as any).branches || []
+    const branches = (layer as any).branches || [];
     params.unshift({
       label: "分支数量",
       value: branches.length.toString(),
-    })
+    });
   }
 
-  return params
+  return params;
 }
 
 export function formatFieldValue(key: string, value: any): string {
   if (value === undefined || value === null) {
-    return ""
+    return "";
   }
 
   if (Array.isArray(value)) {
     const formatArray = (arr: any[]): string =>
       `[${arr
-        .map((item) =>
-          Array.isArray(item) ? formatArray(item) : String(item)
-        )
-        .join(", ")}]`
+        .map((item) => (Array.isArray(item) ? formatArray(item) : String(item)))
+        .join(", ")}]`;
 
     if (value.every((v) => Array.isArray(v))) {
-      return value.map((item) => formatArray(item)).join(" | ")
+      return value.map((item) => formatArray(item)).join(" | ");
     }
     if (value.every((v) => typeof v === "number" || typeof v === "string")) {
-      return formatArray(value)
+      return formatArray(value);
     }
-    return formatArray(value)
+    return formatArray(value);
   }
 
   if (typeof value === "boolean") {
-    return value ? "是" : "否"
+    return value ? "是" : "否";
   }
 
   if (typeof value === "number") {
     if ((key === "rate" || key === "dropout") && value < 1) {
-      return `${(value * 100).toFixed(0)}%`
+      return `${(value * 100).toFixed(0)}%`;
     }
-    return value.toString()
+    return value.toString();
   }
 
-  return String(value)
+  return String(value);
 }

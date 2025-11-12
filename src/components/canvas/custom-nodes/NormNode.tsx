@@ -1,23 +1,24 @@
 import { memo } from "react"
 import { Handle, Position } from "reactflow"
-import { Layers } from "lucide-react"
-import type { NormLayer } from "@/lib/types"
+import type { Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
+import { ICON_MAP } from "@/lib/fieldMapping"
 
 interface NormNodeProps {
-  data: NormLayer
+  data: Layer
   selected?: boolean
 }
 
 export const NormNode = memo(({ data, selected }: NormNodeProps) => {
   const theme = getLayerColorTheme(data)
+  const Icon = ICON_MAP[data.type]
 
   return (
     <div
       className={`
         relative group
-        w-[220px] min-h-[100px]
+        min-w-[240px] min-h-[120px]
         rounded-xl border-2 
         bg-background
         shadow-lg
@@ -36,7 +37,7 @@ export const NormNode = memo(({ data, selected }: NormNodeProps) => {
       <div className="p-4">
         <div className="flex items-center gap-2 mb-2">
           <div className={`p-1.5 rounded-lg ${theme.background}`}>
-            <Layers className={`w-4 h-4 ${theme.textHighlight}`} />
+            <Icon className={`w-4 h-4 ${theme.textHighlight}`} />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm truncate">{data.name}</h3>
@@ -56,7 +57,7 @@ export const NormNode = memo(({ data, selected }: NormNodeProps) => {
       />
       {/* 装饰性图标 */}
       <div className="absolute bottom-2 right-2 opacity-5">
-        <Layers className={`w-12 h-12 ${theme.textHighlight}`} />
+        <Icon className={`w-12 h-12 ${theme.textHighlight}`} />
       </div>
       {/* 悬浮效果 */}
       <div

@@ -79,6 +79,8 @@ export function calculateLayout(
       id: edge.id,
       source: edge.source,
       target: edge.target,
+      sourceHandle: edge.sourceHandle,
+      targetHandle: edge.targetHandle,
       label: edge.label,
       animated: true,
       type: edgeType,
@@ -98,6 +100,7 @@ export function calculateLayout(
 export function getNodeTypeMap(): Record<string, string> {
   return {
     input: "inputNode",
+    embedding: "embeddingNode",
     linear: "linearNode",
     conv2d: "convNode",
     maxpool2d: "poolingNode",
@@ -116,6 +119,8 @@ export function getNodeTypeMap(): Record<string, string> {
     flatten: "calculateNode",
     sequential: "sequentialNode",
     parallel: "parallelNode",
+    "self-attention": "attentionNode",
+    "cross-attention": "attentionNode",
   }
 }
 

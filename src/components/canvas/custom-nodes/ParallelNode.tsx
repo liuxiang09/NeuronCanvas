@@ -1,23 +1,25 @@
 import { memo } from "react"
 import { Handle, Position } from "reactflow"
-import { GitBranch, Layers } from "lucide-react"
-import type { Layer, ParallelLayer } from "@/lib/types"
+import { Layers } from "lucide-react"
+import type { ParallelLayer, Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
 import { formatFieldValue } from "@/lib/fieldMapping"
+import { ICON_MAP } from "@/lib/fieldMapping"
 
 interface ParallelNodeProps {
-  data: ParallelLayer
+  data: ParallelLayer,
   selected?: boolean
 }
 
 export const ParallelNode = memo(({ data, selected }: ParallelNodeProps) => {
   const theme = getLayerColorTheme(data)
   const branches = data.branches || []
+  const Icon = ICON_MAP[data.type]
 
   const renderStep = (step: Layer, index: number) => {
     const stepTheme = getLayerColorTheme(step)
-    const outputShape =
+    const outputShape = 
       ("outputShape" in step && step.outputShape) ? (step as any).outputShape : undefined
 
     return (
@@ -62,7 +64,7 @@ export const ParallelNode = memo(({ data, selected }: ParallelNodeProps) => {
         <div className="flex flex-col h-full space-y-3">
           <div className="flex items-center gap-2">
             <div className={`p-1.5 rounded-lg ${theme.background}`}>
-              <GitBranch className={`w-4 h-4 ${theme.textHighlight}`} />
+              <Icon className={`w-4 h-4 ${theme.textHighlight}`} />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm truncate">{data.name}</h3>
@@ -114,7 +116,7 @@ export const ParallelNode = memo(({ data, selected }: ParallelNodeProps) => {
       />
       {/* 装饰性图标 */}
       <div className="absolute bottom-2 right-2 opacity-5">
-        <GitBranch className={`w-12 h-12 ${theme.textHighlight}`} />
+        <Icon className={`w-12 h-12 ${theme.textHighlight}`} />
       </div>
       {/* 悬浮效果 */}
       <div className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />

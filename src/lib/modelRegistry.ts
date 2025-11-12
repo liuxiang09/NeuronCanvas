@@ -16,6 +16,7 @@ import alexNetData from "@/models/alexnet.json"
 import vgg11Data from "@/models/vgg11.json"
 import googleNetData from "@/models/googlenet.json"
 import resNet18Data from "@/models/resnet18.json"
+import transformerData from "@/models/transformer.json"
 
 
 /**
@@ -28,6 +29,7 @@ export const registeredModels: readonly Model[] = [
   vgg11Data as Model,
   googleNetData as Model,
   resNet18Data as Model,
+  transformerData as Model,
 ] as const
 
 /**

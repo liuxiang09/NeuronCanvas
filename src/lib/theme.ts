@@ -25,6 +25,7 @@ export interface LayerColorTheme {
 
 const LAYER_COLOR_CONFIGS: Record<string, LayerColorConfig> = {
   input: { color: "blue", shade: 500 },
+  embedding: { color: "rose", shade: 500 },
   flatten: { color: "orange", shade: 500 },
   linear: { color: "pink", shade: 500 },
   conv2d: { color: "purple", shade: 500 },
@@ -43,6 +44,8 @@ const LAYER_COLOR_CONFIGS: Record<string, LayerColorConfig> = {
   concat: { color: "violet", shade: 500 },
   sequential: { color: "amber", shade: 500 },
   parallel: { color: "sky", shade: 500 },
+  "self-attention": { color: "violet", shade: 500 },
+  "cross-attention": { color: "violet", shade: 500 },
 };
 
 /*小地图颜色映射*/
@@ -102,6 +105,14 @@ const MINIMAP_COLOR_HEX: Record<string, Record<number, string>> = {
   gray: {
     500: "#6b7280",
     600: "#4b5563",
+  },
+  rose: {
+    500: "#ec4899",
+    600: "#db2777",
+  },
+  fuchsia: {
+    500: "#d946ef",
+    600: "#c026d3",
   },
 };
 

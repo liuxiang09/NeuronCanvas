@@ -1,9 +1,10 @@
 import { memo } from "react"
 import { Handle, Position } from "reactflow"
-import { Package, Layers } from "lucide-react"
+import { Layers } from "lucide-react"
 import type { SequentialLayer, Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
+import { ICON_MAP, formatFieldValue } from "@/lib/fieldMapping"
 
 interface SequentialNodeProps {
   data: SequentialLayer
@@ -13,7 +14,8 @@ interface SequentialNodeProps {
 export const SequentialNode = memo(({ data, selected }: SequentialNodeProps) => {
   const theme = getLayerColorTheme(data)
   const steps = data.steps || []
-  
+  const Icon = ICON_MAP[data.type]
+
   return (
     <div
       className={`
@@ -41,7 +43,7 @@ export const SequentialNode = memo(({ data, selected }: SequentialNodeProps) => 
         <div className="flex flex-col h-full space-y-3">
           <div className="flex items-center gap-2">
             <div className={`p-1.5 rounded-lg ${theme.background}`}>
-              <Package className={`w-4 h-4 ${theme.textHighlight}`} />
+              <Icon className={`w-4 h-4 ${theme.textHighlight}`} />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm truncate">{data.name}</h3>
@@ -69,7 +71,9 @@ export const SequentialNode = memo(({ data, selected }: SequentialNodeProps) => 
                       <span className="font-medium">{step.type}</span>
                       {outputShape && (
                         <span className="text-muted-foreground ml-auto whitespace-pre">
-                          {outputShape.join("×")}
+                          {Array.isArray(outputShape)
+                            ? formatFieldValue("outputShape", outputShape)
+                            : String(outputShape)}
                         </span>
                       )}
                     </div>
@@ -93,7 +97,7 @@ export const SequentialNode = memo(({ data, selected }: SequentialNodeProps) => 
 
       {/* 装饰性图标 */}
       <div className="absolute bottom-2 right-2 opacity-5">
-        <Package className={`w-12 h-12 ${theme.textHighlight}`} />
+        <Icon className={`w-12 h-12 ${theme.textHighlight}`} />
       </div>
       {/* 悬浮效果 */}
       <div className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />

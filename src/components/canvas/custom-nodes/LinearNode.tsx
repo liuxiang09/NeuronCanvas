@@ -1,17 +1,18 @@
 import { memo } from "react"
 import { Handle, Position } from "reactflow"
-import { Network } from "lucide-react"
-import type { LinearLayer } from "@/lib/types"
+import type { Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
+import { ICON_MAP } from "@/lib/fieldMapping"
 
 interface LinearNodeProps {
-  data: LinearLayer
+  data: Layer
   selected?: boolean
 }
 
 export const LinearNode = memo(({ data, selected }: LinearNodeProps) => {
   const theme = getLayerColorTheme(data)
+  const Icon = ICON_MAP[data.type]
 
   return (
     <div
@@ -40,7 +41,7 @@ export const LinearNode = memo(({ data, selected }: LinearNodeProps) => {
         {/* 标题区 */}
         <div className="flex items-center gap-2 mb-3">
           <div className={`p-1.5 rounded-lg ${theme.background}`}>
-            <Network className={`w-4 h-4 ${theme.textHighlight}`} />
+            <Icon className={`w-4 h-4 ${theme.textHighlight}`} />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm truncate">{data.name}</h3>
@@ -60,7 +61,7 @@ export const LinearNode = memo(({ data, selected }: LinearNodeProps) => {
       />
       {/* 装饰性图标 */}
       <div className="absolute bottom-2 right-2 opacity-5">
-        <Network className={`w-12 h-12 ${theme.textHighlight}`} />
+        <Icon className={`w-12 h-12 ${theme.textHighlight}`} />
       </div>
       {/* 悬浮效果 */}
       <div

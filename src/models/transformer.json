@@ -1,0 +1,774 @@
+{
+  "metadata": {
+    "name": "transformer",
+    "displayName": "Transformer",
+    "description": "-",
+    "year": 2017,
+    "authors": [
+      "Ashish Vaswani",
+      "Noam Shazeer",
+      "Niki Parmar",
+      "Jakob Uszkoreit",
+      "Llion Jones",
+      "Aidan N. Gomez",
+      "Łukasz Kaiser",
+      "Illia Polosukhin"
+    ],
+    "paper": "https://arxiv.org/abs/1706.03762",
+    "paperTitle": "Attention Is All You Need",
+    "tags": ["Transformer", "Seq2Seq", "Attention", "NLP"],
+    "category": ["Transformer"],
+    "verified": false
+  },
+  "layers": [
+    {
+      "id": "src_tokens",
+      "name": "源序列 (Token IDs)",
+      "type": "input",
+      "description": "-",
+      "shape": ["B", 128]
+    },
+    {
+      "id": "src_embedding",
+      "name": "源嵌入",
+      "type": "embedding",
+      "description": "-",
+      "dimension": 512,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "src_positional_signal",
+      "name": "位置编码 (Sinusoidal)",
+      "type": "input",
+      "description": "-",
+      "shape": [128, 512]
+    },
+    {
+      "id": "src_embedding_with_pos",
+      "name": "嵌入 + 位置编码",
+      "type": "add",
+      "description": "-",
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "encoder_qkv_projection",
+      "name": "QKV 线性映射",
+      "type": "parallel",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": [
+        ["B", 128, 512],
+        ["B", 128, 512],
+        ["B", 128, 512]
+      ],
+      "branches": [
+        {
+          "id": "encoder_q_branch",
+          "name": "Query",
+          "steps": [
+            {
+              "id": "encoder_q_linear",
+              "name": "线性层 (Wq)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "encoder_k_branch",
+          "name": "Key",
+          "steps": [
+            {
+              "id": "encoder_k_linear",
+              "name": "线性层 (Wk)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "encoder_v_branch",
+          "name": "Value",
+          "steps": [
+            {
+              "id": "encoder_v_linear",
+              "name": "线性层 (Wv)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "encoder_self_attention",
+      "name": "多头自注意力",
+      "type": "self-attention",
+      "description": "-",
+      "numHeads": 8,
+      "headDim": 64,
+      "modelDim": 512,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "encoder_attn_dropout",
+      "name": "Dropout",
+      "type": "dropout",
+      "description": "-",
+      "rate": 0.1,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "encoder_attention_output",
+      "name": "注意力残差 & LayerNorm",
+      "type": "sequential",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": ["B", 128, 512],
+      "steps": [
+        {
+          "id": "encoder_attn_residual",
+          "name": "Residual Add",
+          "type": "add",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "encoder_attn_norm",
+          "name": "LayerNorm",
+          "type": "layernorm",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "encoder_ffn",
+      "name": "前馈网络 (FFN)",
+      "type": "sequential",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": ["B", 128, 512],
+      "color": "emerald",
+      "steps": [
+        {
+          "id": "encoder_ffn_linear1",
+          "name": "线性扩展",
+          "type": "linear",
+          "description": "-",
+          "outputShape": ["B", 128, 2048]
+        },
+        {
+          "id": "encoder_ffn_activation",
+          "name": "GELU 激活",
+          "type": "relu",
+          "description": "-",
+          "outputShape": ["B", 128, 2048]
+        },
+        {
+          "id": "encoder_ffn_dropout",
+          "name": "Dropout",
+          "type": "dropout",
+          "description": "-",
+          "rate": 0.1,
+          "outputShape": ["B", 128, 2048]
+        },
+        {
+          "id": "encoder_ffn_linear2",
+          "name": "线性压缩",
+          "type": "linear",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "encoder_ffn_dropout_out",
+      "name": "Dropout",
+      "type": "dropout",
+      "description": "-",
+      "rate": 0.1,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "encoder_ffn_output",
+      "name": "FFN 残差 & LayerNorm",
+      "type": "sequential",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": ["B", 128, 512],
+      "steps": [
+        {
+          "id": "encoder_ffn_residual",
+          "name": "Residual Add",
+          "type": "add",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "encoder_ffn_norm",
+          "name": "LayerNorm",
+          "type": "layernorm",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "tgt_tokens",
+      "name": "目标序列 (Token IDs)",
+      "type": "input",
+      "description": "-",
+      "shape": ["B", 128]
+    },
+    {
+      "id": "tgt_embedding",
+      "name": "目标嵌入",
+      "type": "embedding",
+      "description": "-",
+      "dimension": 512,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "tgt_positional_signal",
+      "name": "目标位置编码",
+      "type": "input",
+      "description": "-",
+      "shape": [128, 512]
+    },
+    {
+      "id": "tgt_embedding_with_pos",
+      "name": "嵌入 + 位置编码",
+      "type": "add",
+      "description": "-",
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "decoder_self_qkv_projection",
+      "name": "解码器自注意力 QKV",
+      "type": "parallel",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": [
+        ["B", 128, 512],
+        ["B", 128, 512],
+        ["B", 128, 512]
+      ],
+      "branches": [
+        {
+          "id": "decoder_self_q_branch",
+          "name": "Query",
+          "steps": [
+            {
+              "id": "decoder_self_q_linear",
+              "name": "线性层 (Wq)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "decoder_self_k_branch",
+          "name": "Key",
+          "steps": [
+            {
+              "id": "decoder_self_k_linear",
+              "name": "线性层 (Wk)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "decoder_self_v_branch",
+          "name": "Value",
+          "steps": [
+            {
+              "id": "decoder_self_v_linear",
+              "name": "线性层 (Wv)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "decoder_self_attention",
+      "name": "解码器 Masked 自注意力",
+      "type": "self-attention",
+      "description": "-",
+      "numHeads": 8,
+      "headDim": 64,
+      "modelDim": 512,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "decoder_self_dropout",
+      "name": "Dropout",
+      "type": "dropout",
+      "description": "-",
+      "rate": 0.1,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "decoder_self_output",
+      "name": "自注意力残差 & LayerNorm",
+      "type": "sequential",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": ["B", 128, 512],
+      "steps": [
+        {
+          "id": "decoder_self_residual",
+          "name": "Residual Add",
+          "type": "add",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "decoder_self_norm",
+          "name": "LayerNorm",
+          "type": "layernorm",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "decoder_cross_projection",
+      "name": "交叉注意力 Q/K/V",
+      "type": "parallel",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": [
+        ["B", 128, 512],
+        ["B", 128, 512],
+        ["B", 128, 512]
+      ],
+      "branches": [
+        {
+          "id": "decoder_cross_query_branch",
+          "name": "Query (Decoder)",
+          "steps": [
+            {
+              "id": "decoder_cross_q_linear",
+              "name": "线性层 (Wq)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "decoder_cross_key_branch",
+          "name": "Key (Encoder)",
+          "steps": [
+            {
+              "id": "decoder_cross_k_linear",
+              "name": "线性层 (Wk)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "decoder_cross_value_branch",
+          "name": "Value (Encoder)",
+          "steps": [
+            {
+              "id": "decoder_cross_v_linear",
+              "name": "线性层 (Wv)",
+              "type": "linear",
+              "description": "-",
+              "outputShape": ["B", 128, 512]
+            }
+          ],
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "decoder_cross_attention",
+      "name": "交叉多头注意力",
+      "type": "cross-attention",
+      "description": "-",
+      "numHeads": 8,
+      "headDim": 64,
+      "modelDim": 512,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "decoder_cross_dropout",
+      "name": "Dropout",
+      "type": "dropout",
+      "description": "-",
+      "rate": 0.1,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "decoder_cross_output",
+      "name": "交叉注意力残差 & LayerNorm",
+      "type": "sequential",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": ["B", 128, 512],
+      "steps": [
+        {
+          "id": "decoder_cross_residual",
+          "name": "Residual Add",
+          "type": "add",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "decoder_cross_norm",
+          "name": "LayerNorm",
+          "type": "layernorm",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "decoder_ffn",
+      "name": "解码器 FFN",
+      "type": "sequential",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": ["B", 128, 512],
+      "color": "emerald",
+      "steps": [
+        {
+          "id": "decoder_ffn_linear1",
+          "name": "线性扩展",
+          "type": "linear",
+          "description": "-",
+          "outputShape": ["B", 128, 2048]
+        },
+        {
+          "id": "decoder_ffn_activation",
+          "name": "GELU 激活",
+          "type": "relu",
+          "description": "-",
+          "outputShape": ["B", 128, 2048]
+        },
+        {
+          "id": "decoder_ffn_dropout",
+          "name": "Dropout",
+          "type": "dropout",
+          "description": "-",
+          "rate": 0.1,
+          "outputShape": ["B", 128, 2048]
+        },
+        {
+          "id": "decoder_ffn_linear2",
+          "name": "线性压缩",
+          "type": "linear",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "decoder_ffn_dropout_out",
+      "name": "Dropout",
+      "type": "dropout",
+      "description": "-",
+      "rate": 0.1,
+      "outputShape": ["B", 128, 512]
+    },
+    {
+      "id": "decoder_ffn_output",
+      "name": "解码器残差 & LayerNorm",
+      "type": "sequential",
+      "description": "-",
+      "inputShape": ["B", 128, 512],
+      "outputShape": ["B", 128, 512],
+      "steps": [
+        {
+          "id": "decoder_ffn_residual",
+          "name": "Residual Add",
+          "type": "add",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        },
+        {
+          "id": "decoder_ffn_norm",
+          "name": "LayerNorm",
+          "type": "layernorm",
+          "description": "-",
+          "outputShape": ["B", 128, 512]
+        }
+      ]
+    },
+    {
+      "id": "decoder_logits",
+      "name": "输出投影",
+      "type": "linear",
+      "description": "-",
+      "outputShape": ["B", 128, 32000]
+    },
+    {
+      "id": "decoder_softmax",
+      "name": "Softmax 输出",
+      "type": "softmax",
+      "description": "-",
+      "outputShape": ["B", 128, 32000]
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_src_tokens_to_embedding",
+      "source": "src_tokens",
+      "target": "src_embedding",
+      "type": "normal"
+    },
+    {
+      "id": "edge_src_embedding_to_add",
+      "source": "src_embedding",
+      "target": "src_embedding_with_pos",
+      "type": "normal"
+    },
+    {
+      "id": "edge_src_pos_to_add",
+      "source": "src_positional_signal",
+      "target": "src_embedding_with_pos",
+      "type": "normal"
+    },
+    {
+      "id": "edge_add_to_qkv",
+      "source": "src_embedding_with_pos",
+      "target": "encoder_qkv_projection",
+      "type": "normal"
+    },
+    {
+      "id": "edge_qkv_to_self_query",
+      "source": "encoder_qkv_projection",
+      "target": "encoder_self_attention",
+      "type": "normal",
+      "targetHandle": "query"
+    },
+    {
+      "id": "edge_qkv_to_self_key",
+      "source": "encoder_qkv_projection",
+      "target": "encoder_self_attention",
+      "type": "normal",
+      "targetHandle": "key"
+    },
+    {
+      "id": "edge_qkv_to_self_value",
+      "source": "encoder_qkv_projection",
+      "target": "encoder_self_attention",
+      "type": "normal",
+      "targetHandle": "value"
+    },
+    {
+      "id": "edge_attention_to_dropout",
+      "source": "encoder_self_attention",
+      "target": "encoder_attn_dropout",
+      "type": "normal"
+    },
+    {
+      "id": "edge_dropout_to_residual",
+      "source": "encoder_attn_dropout",
+      "target": "encoder_attention_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_add_to_residual",
+      "source": "src_embedding_with_pos",
+      "target": "encoder_attention_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_residual_to_ffn",
+      "source": "encoder_attention_output",
+      "target": "encoder_ffn",
+      "type": "normal"
+    },
+    {
+      "id": "edge_ffn_to_dropout",
+      "source": "encoder_ffn",
+      "target": "encoder_ffn_dropout_out",
+      "type": "normal"
+    },
+    {
+      "id": "edge_dropout_to_ffn_residual",
+      "source": "encoder_ffn_dropout_out",
+      "target": "encoder_ffn_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_residual_to_ffn_residual",
+      "source": "encoder_attention_output",
+      "target": "encoder_ffn_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_tgt_tokens_to_embedding",
+      "source": "tgt_tokens",
+      "target": "tgt_embedding",
+      "type": "normal"
+    },
+    {
+      "id": "edge_tgt_embedding_to_add",
+      "source": "tgt_embedding",
+      "target": "tgt_embedding_with_pos",
+      "type": "normal"
+    },
+    {
+      "id": "edge_tgt_pos_to_add",
+      "source": "tgt_positional_signal",
+      "target": "tgt_embedding_with_pos",
+      "type": "normal"
+    },
+    {
+      "id": "edge_tgt_add_to_self_qkv",
+      "source": "tgt_embedding_with_pos",
+      "target": "decoder_self_qkv_projection",
+      "type": "normal"
+    },
+    {
+      "id": "edge_self_qkv_to_self_query",
+      "source": "decoder_self_qkv_projection",
+      "target": "decoder_self_attention",
+      "type": "normal",
+      "targetHandle": "query"
+    },
+    {
+      "id": "edge_self_qkv_to_self_key",
+      "source": "decoder_self_qkv_projection",
+      "target": "decoder_self_attention",
+      "type": "normal",
+      "targetHandle": "key"
+    },
+    {
+      "id": "edge_self_qkv_to_self_value",
+      "source": "decoder_self_qkv_projection",
+      "target": "decoder_self_attention",
+      "type": "normal",
+      "targetHandle": "value"
+    },
+    {
+      "id": "edge_self_attention_to_dropout",
+      "source": "decoder_self_attention",
+      "target": "decoder_self_dropout",
+      "type": "normal"
+    },
+    {
+      "id": "edge_dropout_to_self_residual",
+      "source": "decoder_self_dropout",
+      "target": "decoder_self_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_tgt_add_to_self_residual",
+      "source": "tgt_embedding_with_pos",
+      "target": "decoder_self_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_self_residual_to_cross_qkv",
+      "source": "decoder_self_output",
+      "target": "decoder_cross_projection",
+      "type": "normal"
+    },
+    {
+      "id": "edge_encoder_memory_to_cross_qkv",
+      "source": "encoder_ffn_output",
+      "target": "decoder_cross_projection",
+      "type": "normal"
+    },
+    {
+      "id": "edge_cross_qkv_to_attention_query",
+      "source": "decoder_cross_projection",
+      "target": "decoder_cross_attention",
+      "type": "normal",
+      "targetHandle": "query"
+    },
+    {
+      "id": "edge_cross_qkv_to_attention_key",
+      "source": "decoder_cross_projection",
+      "target": "decoder_cross_attention",
+      "type": "normal",
+      "targetHandle": "key"
+    },
+    {
+      "id": "edge_cross_qkv_to_attention_value",
+      "source": "decoder_cross_projection",
+      "target": "decoder_cross_attention",
+      "type": "normal",
+      "targetHandle": "value"
+    },
+    {
+      "id": "edge_cross_attention_to_dropout",
+      "source": "decoder_cross_attention",
+      "target": "decoder_cross_dropout",
+      "type": "normal"
+    },
+    {
+      "id": "edge_dropout_to_cross_residual",
+      "source": "decoder_cross_dropout",
+      "target": "decoder_cross_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_self_residual_to_cross_residual",
+      "source": "decoder_self_output",
+      "target": "decoder_cross_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_cross_residual_to_ffn",
+      "source": "decoder_cross_output",
+      "target": "decoder_ffn",
+      "type": "normal"
+    },
+    {
+      "id": "edge_decoder_ffn_to_dropout",
+      "source": "decoder_ffn",
+      "target": "decoder_ffn_dropout_out",
+      "type": "normal"
+    },
+    {
+      "id": "edge_dropout_to_decoder_ffn_residual",
+      "source": "decoder_ffn_dropout_out",
+      "target": "decoder_ffn_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_cross_residual_to_ffn_residual",
+      "source": "decoder_cross_output",
+      "target": "decoder_ffn_output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_decoder_ffn_output_to_logits",
+      "source": "decoder_ffn_output",
+      "target": "decoder_logits",
+      "type": "normal"
+    },
+    {
+      "id": "edge_logits_to_softmax",
+      "source": "decoder_logits",
+      "target": "decoder_softmax",
+      "type": "normal"
+    }
+  ]
+}

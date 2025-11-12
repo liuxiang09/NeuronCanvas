@@ -1,15 +1,10 @@
-import { memo, type ComponentType } from "react"
+import { memo } from "react"
 import { Handle, Position } from "reactflow"
-import { Plus, GitMerge, Maximize2 } from "lucide-react"
 import type { Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
 import { renderLayerFields } from "@/lib/hooks/nodeRender"
+import { ICON_MAP } from "@/lib/fieldMapping"
 
-const TYPE_ICON_MAP: Record<string, ComponentType<{ className?: string }>> = {
-  add: Plus,
-  concat: GitMerge,
-  flatten: Maximize2,
-}
 
 interface CalculateNodeProps {
   data: Layer
@@ -18,8 +13,7 @@ interface CalculateNodeProps {
 
 export const CalculateNode = memo(({ data, selected }: CalculateNodeProps) => {
   const theme = getLayerColorTheme(data)
-  const Icon = TYPE_ICON_MAP[data.type]
-  const label = data.type ?? "null"
+  const Icon = ICON_MAP[data.type]
 
   return (
     <div
@@ -48,7 +42,7 @@ export const CalculateNode = memo(({ data, selected }: CalculateNodeProps) => {
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm truncate">{data.name}</h3>
-            <p className="text-xs text-muted-foreground">{label}</p>
+            <p className="text-xs text-muted-foreground">{data.type}</p>
           </div>
         </div>
 
