@@ -5,12 +5,12 @@ import type { LayerColorTheme } from "../theme"
 /**
  * 需要高亮显示的字段（使用层的主题色）
  */
-const HIGHLIGHT_FIELDS = ["outputShape", "shape"]
+const HIGHLIGHT_FIELDS = ["outputShape"]
 
 /**
  * 需要顶部边框的字段（用于视觉分隔）
  */
-const BORDER_FIELDS = ["outputShape", "shape"]
+const BORDER_FIELDS = ["outputShape"]
 
 /**
  * 渲染层的参数字段（用于节点卡片显示）
@@ -37,7 +37,7 @@ export function renderLayerFields(layer: Layer, theme: LayerColorTheme) {
         const label = getFieldLabel(fieldKey)
         let formattedValue = formatFieldValue(fieldKey, value)
 
-        if (fieldKey === "outputShape" || fieldKey === "inputShape") {
+        if (fieldKey === "outputShape") {
           formattedValue = `\t${formattedValue}`
         }
 

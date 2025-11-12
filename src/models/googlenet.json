@@ -23,14 +23,14 @@
       "name": "输入层",
       "type": "input",
       "description": "接收224x224像素的RGB彩色图像。",
-      "shape": ["B", 3, 224, 224]
+      "outputShape": [64, 3, 224, 224]
     },
     {
       "id": "stem_network",
       "name": "主干网络",
       "type": "sequential",
       "description": "网络的主干部分，由一系列传统的卷积和池化层组成，用于在进入Inception模块前，快速降低图像的空间分辨率并提取基础特征。",
-      "outputShape": ["B", 192, 28, 28],
+      "outputShape": [64, 192, 28, 28],
       "steps": [
         {
           "id": "conv1",
@@ -40,15 +40,14 @@
           "kernelSize": [7, 7],
           "stride": [2, 2],
           "padding": [3, 3],
-          "outputShape": ["B", 64, 112, 112]
+          "outputShape": [64, 64, 112, 112]
         },
         {
           "id": "conv1_act",
           "name": "ReLU 激活",
           "type": "relu",
           "activation": "relu",
-          "inputShape": ["B", 64, 112, 112],
-          "outputShape": ["B", 64, 112, 112]
+          "outputShape": [64, 64, 112, 112]
         },
         {
           "id": "pool1",
@@ -57,7 +56,7 @@
           "poolSize": [3, 3],
           "stride": [2, 2],
           "padding": [1, 1],
-          "outputShape": ["B", 64, 56, 56]
+          "outputShape": [64, 64, 56, 56]
         },
         {
           "id": "conv2",
@@ -67,15 +66,14 @@
           "kernelSize": [3, 3],
           "stride": [1, 1],
           "padding": [1, 1],
-          "outputShape": ["B", 192, 56, 56]
+          "outputShape": [64, 192, 56, 56]
         },
         {
           "id": "conv2_act",
           "name": "ReLU 激活",
           "type": "relu",
           "activation": "relu",
-          "inputShape": ["B", 192, 56, 56],
-          "outputShape": ["B", 192, 56, 56]
+          "outputShape": [64, 192, 56, 56]
         },
         {
           "id": "pool2",
@@ -84,7 +82,7 @@
           "poolSize": [3, 3],
           "stride": [2, 2],
           "padding": [1, 1],
-          "outputShape": ["B", 192, 28, 28]
+          "outputShape": [64, 192, 28, 28]
         }
       ]
     },
@@ -107,18 +105,17 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 64, 28, 28]
+              "outputShape": [64, 64, 28, 28]
             },
             {
               "id": "inception3a_1x1_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 64, 28, 28],
-              "outputShape": ["B", 64, 28, 28]
+              "outputShape": [64, 64, 28, 28]
             }
           ],
-          "outputShape": ["B", 64, 28, 28]
+          "outputShape": [64, 64, 28, 28]
         },
         {
           "id": "inception3a_branch2_branch",
@@ -133,15 +130,14 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 96, 28, 28]
+              "outputShape": [64, 96, 28, 28]
             },
             {
               "id": "inception3a_3x3_reduce_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 96, 28, 28],
-              "outputShape": ["B", 96, 28, 28]
+              "outputShape": [64, 96, 28, 28]
             },
             {
               "id": "inception3a_3x3",
@@ -151,18 +147,17 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "inception3a_3x3_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 128, 28, 28],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             }
           ],
-          "outputShape": ["B", 128, 28, 28]
+          "outputShape": [64, 128, 28, 28]
         },
         {
           "id": "inception3a_branch3_branch",
@@ -177,15 +172,14 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 16, 28, 28]
+              "outputShape": [64, 16, 28, 28]
             },
             {
               "id": "inception3a_5x5_reduce_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 16, 28, 28],
-              "outputShape": ["B", 16, 28, 28]
+              "outputShape": [64, 16, 28, 28]
             },
             {
               "id": "inception3a_5x5",
@@ -195,18 +189,17 @@
               "kernelSize": [5, 5],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 32, 28, 28]
+              "outputShape": [64, 32, 28, 28]
             },
             {
               "id": "inception3a_5x5_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 32, 28, 28],
-              "outputShape": ["B", 32, 28, 28]
+              "outputShape": [64, 32, 28, 28]
             }
           ],
-          "outputShape": ["B", 32, 28, 28]
+          "outputShape": [64, 32, 28, 28]
         },
         {
           "id": "inception3a_pool_branch",
@@ -219,7 +212,7 @@
               "description": "Pool 3×3 → 32×1×1\n2 层",
               "poolSize": [3, 3],
               "stride": [1, 1],
-              "outputShape": ["B", 192, 28, 28]
+              "outputShape": [64, 192, 28, 28]
             },
             {
               "id": "inception3a_pool_proj",
@@ -229,25 +222,24 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 32, 28, 28]
+              "outputShape": [64, 32, 28, 28]
             },
             {
               "id": "inception3a_pool_proj_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 32, 28, 28],
-              "outputShape": ["B", 32, 28, 28]
+              "outputShape": [64, 32, 28, 28]
             }
           ],
-          "outputShape": ["B", 32, 28, 28]
+          "outputShape": [64, 32, 28, 28]
         }
       ],
       "outputShape": [
-        ["B", 64, 28, 28],
-        ["B", 128, 28, 28],
-        ["B", 32, 28, 28],
-        ["B", 32, 28, 28]
+        [64, 64, 28, 28],
+        [64, 128, 28, 28],
+        [64, 32, 28, 28],
+        [64, 32, 28, 28]
       ]
     },
     {
@@ -255,7 +247,7 @@
       "name": "concat3a",
       "type": "concat",
       "description": "第一个 Inception 模块，包含 4 个并行分支处理多尺度特征",
-      "outputShape": ["B", 256, 28, 28]
+      "outputShape": [64, 256, 28, 28]
     },
     {
       "id": "inception3b_parallel",
@@ -276,18 +268,17 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "inception3b_1x1_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 128, 28, 28],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             }
           ],
-          "outputShape": ["B", 128, 28, 28]
+          "outputShape": [64, 128, 28, 28]
         },
         {
           "id": "inception3b_branch2_branch",
@@ -302,15 +293,14 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "inception3b_3x3_reduce_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 128, 28, 28],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "inception3b_3x3",
@@ -320,18 +310,17 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 192, 28, 28]
+              "outputShape": [64, 192, 28, 28]
             },
             {
               "id": "inception3b_3x3_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 192, 28, 28],
-              "outputShape": ["B", 192, 28, 28]
+              "outputShape": [64, 192, 28, 28]
             }
           ],
-          "outputShape": ["B", 192, 28, 28]
+          "outputShape": [64, 192, 28, 28]
         },
         {
           "id": "inception3b_branch3_branch",
@@ -346,15 +335,14 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 32, 28, 28]
+              "outputShape": [64, 32, 28, 28]
             },
             {
               "id": "inception3b_5x5_reduce_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 32, 28, 28],
-              "outputShape": ["B", 32, 28, 28]
+              "outputShape": [64, 32, 28, 28]
             },
             {
               "id": "inception3b_5x5",
@@ -364,18 +352,17 @@
               "kernelSize": [5, 5],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 96, 28, 28]
+              "outputShape": [64, 96, 28, 28]
             },
             {
               "id": "inception3b_5x5_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 96, 28, 28],
-              "outputShape": ["B", 96, 28, 28]
+              "outputShape": [64, 96, 28, 28]
             }
           ],
-          "outputShape": ["B", 96, 28, 28]
+          "outputShape": [64, 96, 28, 28]
         },
         {
           "id": "inception3b_pool_branch",
@@ -388,7 +375,7 @@
               "description": "Pool 3×3 → 64×1×1\n2 层",
               "poolSize": [3, 3],
               "stride": [1, 1],
-              "outputShape": ["B", 256, 28, 28]
+              "outputShape": [64, 256, 28, 28]
             },
             {
               "id": "inception3b_pool_proj",
@@ -398,25 +385,24 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 64, 28, 28]
+              "outputShape": [64, 64, 28, 28]
             },
             {
               "id": "inception3b_pool_proj_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 64, 28, 28],
-              "outputShape": ["B", 64, 28, 28]
+              "outputShape": [64, 64, 28, 28]
             }
           ],
-          "outputShape": ["B", 64, 28, 28]
+          "outputShape": [64, 64, 28, 28]
         }
       ],
       "outputShape": [
-        ["B", 128, 28, 28],
-        ["B", 192, 28, 28],
-        ["B", 96, 28, 28],
-        ["B", 64, 28, 28]
+        [64, 128, 28, 28],
+        [64, 192, 28, 28],
+        [64, 96, 28, 28],
+        [64, 64, 28, 28]
       ]
     },
     {
@@ -424,7 +410,7 @@
       "name": "concat3b",
       "type": "concat",
       "description": "第二个 Inception 模块，继续提取多尺度特征",
-      "outputShape": ["B", 480, 28, 28]
+      "outputShape": [64, 480, 28, 28]
     },
     {
       "id": "pool3",
@@ -433,7 +419,7 @@
       "description": "降低特征图尺寸",
       "poolSize": [3, 3],
       "stride": [2, 2],
-      "outputShape": ["B", 480, 14, 14]
+      "outputShape": [64, 480, 14, 14]
     },
     {
       "id": "inception4a_parallel",
@@ -454,18 +440,17 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 192, 14, 14]
+              "outputShape": [64, 192, 14, 14]
             },
             {
               "id": "inception4a_1x1_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 192, 14, 14],
-              "outputShape": ["B", 192, 14, 14]
+              "outputShape": [64, 192, 14, 14]
             }
           ],
-          "outputShape": ["B", 192, 14, 14]
+          "outputShape": [64, 192, 14, 14]
         },
         {
           "id": "inception4a_branch2_branch",
@@ -480,15 +465,14 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 96, 14, 14]
+              "outputShape": [64, 96, 14, 14]
             },
             {
               "id": "inception4a_3x3_reduce_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 96, 14, 14],
-              "outputShape": ["B", 96, 14, 14]
+              "outputShape": [64, 96, 14, 14]
             },
             {
               "id": "inception4a_3x3",
@@ -498,18 +482,17 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 208, 14, 14]
+              "outputShape": [64, 208, 14, 14]
             },
             {
               "id": "inception4a_3x3_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 208, 14, 14],
-              "outputShape": ["B", 208, 14, 14]
+              "outputShape": [64, 208, 14, 14]
             }
           ],
-          "outputShape": ["B", 208, 14, 14]
+          "outputShape": [64, 208, 14, 14]
         },
         {
           "id": "inception4a_branch3_branch",
@@ -524,15 +507,14 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 16, 14, 14]
+              "outputShape": [64, 16, 14, 14]
             },
             {
               "id": "inception4a_5x5_reduce_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 16, 14, 14],
-              "outputShape": ["B", 16, 14, 14]
+              "outputShape": [64, 16, 14, 14]
             },
             {
               "id": "inception4a_5x5",
@@ -542,18 +524,17 @@
               "kernelSize": [5, 5],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 48, 14, 14]
+              "outputShape": [64, 48, 14, 14]
             },
             {
               "id": "inception4a_5x5_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 48, 14, 14],
-              "outputShape": ["B", 48, 14, 14]
+              "outputShape": [64, 48, 14, 14]
             }
           ],
-          "outputShape": ["B", 48, 14, 14]
+          "outputShape": [64, 48, 14, 14]
         },
         {
           "id": "inception4a_pool_branch",
@@ -566,7 +547,7 @@
               "description": "Pool 3×3 → 64×1×1\n2 层",
               "poolSize": [3, 3],
               "stride": [1, 1],
-              "outputShape": ["B", 480, 14, 14]
+              "outputShape": [64, 480, 14, 14]
             },
             {
               "id": "inception4a_pool_proj",
@@ -576,25 +557,24 @@
               "kernelSize": [1, 1],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 64, 14, 14]
+              "outputShape": [64, 64, 14, 14]
             },
             {
               "id": "inception4a_pool_proj_act",
               "name": "ReLU 激活",
               "type": "relu",
               "activation": "relu",
-              "inputShape": ["B", 64, 14, 14],
-              "outputShape": ["B", 64, 14, 14]
+              "outputShape": [64, 64, 14, 14]
             }
           ],
-          "outputShape": ["B", 64, 14, 14]
+          "outputShape": [64, 64, 14, 14]
         }
       ],
       "outputShape": [
-        ["B", 192, 14, 14],
-        ["B", 208, 14, 14],
-        ["B", 48, 14, 14],
-        ["B", 64, 14, 14]
+        [64, 192, 14, 14],
+        [64, 208, 14, 14],
+        [64, 48, 14, 14],
+        [64, 64, 14, 14]
       ]
     },
     {
@@ -602,7 +582,7 @@
       "name": "concat4a",
       "type": "concat",
       "description": "更深层的 Inception 模块",
-      "outputShape": ["B", 512, 14, 14]
+      "outputShape": [64, 512, 14, 14]
     },
     {
       "id": "pool4",
@@ -611,14 +591,14 @@
       "description": "全局平均池化",
       "poolSize": [7, 7],
       "stride": [1, 1],
-      "outputShape": ["B", 512, 1, 1]
+      "outputShape": [64, 512, 1, 1]
     },
     {
       "id": "flatten",
       "name": "Flatten",
       "type": "flatten",
       "description": "展平为一维向量",
-      "outputShape": ["B", 512]
+      "outputShape": [64, 512]
     },
     {
       "id": "dropout",
@@ -626,7 +606,7 @@
       "type": "dropout",
       "description": "防止过拟合",
       "rate": 0.4,
-      "outputShape": ["B", 512]
+      "outputShape": [64, 512]
     },
     {
       "id": "fc",
@@ -634,30 +614,28 @@
       "type": "linear",
       "description": "分类前的全连接层",
       "units": 1000,
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     },
     {
       "id": "fc_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 1000],
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     },
     {
       "id": "output",
       "name": "输出层",
       "type": "linear",
       "description": "1000 类别输出",
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     },
     {
       "id": "output_act",
       "name": "Softmax 激活",
       "type": "softmax",
       "activation": "softmax",
-      "inputShape": ["B", 1000],
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     }
   ],
   "edges": [

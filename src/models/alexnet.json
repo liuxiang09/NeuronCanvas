@@ -4,22 +4,12 @@
     "displayName": "AlexNet",
     "description": "AlexNet 是由 Alex Krizhevsky 等人于 2012 年提出的深度卷积神经网络,在 ImageNet 竞赛中取得突破性成绩,标志着深度学习时代的开始。它首次证明了深度卷积网络在大规模图像识别任务中的强大能力。",
     "year": 2012,
-    "authors": [
-      "Alex Krizhevsky",
-      "Ilya Sutskever",
-      "Geoffrey E. Hinton"
-    ],
+    "authors": ["Alex Krizhevsky", "Ilya Sutskever", "Geoffrey E. Hinton"],
     "paper": "https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf",
     "paperTitle": "ImageNet Classification with Deep Convolutional Neural Networks",
     "citations": 149299,
-    "tags": [
-      "CNN",
-      "图像分类",
-      "MINIST"
-    ],
-    "category": [
-      "CNN"
-    ],
+    "tags": ["CNN", "图像分类", "MINIST"],
+    "category": ["CNN"],
     "verified": false
   },
   "layers": [
@@ -28,12 +18,7 @@
       "name": "输入层",
       "type": "input",
       "description": "接收原始的图像数据，每个图像为227x227像素，有3个颜色通道（RGB）。",
-      "shape": [
-        "B",
-        3,
-        227,
-        227
-      ]
+      "outputShape": [64, 3, 227, 227]
     },
     {
       "id": "conv1",
@@ -41,42 +26,17 @@
       "type": "conv2d",
       "description": "使用较大的卷积核快速提取图像的低级特征，如边缘、角落和颜色块。",
       "filters": 96,
-      "kernelSize": [
-        11,
-        11
-      ],
-      "stride": [
-        4,
-        4
-      ],
-      "padding": [
-        0,
-        0
-      ],
-      "outputShape": [
-        "B",
-        96,
-        55,
-        55
-      ]
+      "kernelSize": [11, 11],
+      "stride": [4, 4],
+      "padding": [0, 0],
+      "outputShape": [64, 96, 55, 55]
     },
     {
       "id": "conv1_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": [
-        "B",
-        96,
-        55,
-        55
-      ],
-      "outputShape": [
-        "B",
-        96,
-        55,
-        55
-      ]
+      "outputShape": [64, 96, 55, 55]
     },
     {
       "id": "lrn1",
@@ -86,36 +46,17 @@
       "alpha": 0.0001,
       "beta": 0.75,
       "k": 2,
-      "outputShape": [
-        "B",
-        96,
-        55,
-        55
-      ]
+      "outputShape": [64, 96, 55, 55]
     },
     {
       "id": "pool1",
       "name": "池化层-1",
       "type": "maxpool2d",
       "description": "对特征图进行下采样，减少数据维度，保留最显著的特征，并提供平移不变性。",
-      "poolSize": [
-        3,
-        3
-      ],
-      "stride": [
-        2,
-        2
-      ],
-      "padding": [
-        0,
-        0
-      ],
-      "outputShape": [
-        "B",
-        96,
-        27,
-        27
-      ]
+      "poolSize": [3, 3],
+      "stride": [2, 2],
+      "padding": [0, 0],
+      "outputShape": [64, 96, 27, 27]
     },
     {
       "id": "conv2",
@@ -123,42 +64,17 @@
       "type": "conv2d",
       "description": "在第一层的基础上学习更复杂、更抽象的特征组合。",
       "filters": 256,
-      "kernelSize": [
-        5,
-        5
-      ],
-      "stride": [
-        1,
-        1
-      ],
-      "padding": [
-        2,
-        2
-      ],
-      "outputShape": [
-        "B",
-        256,
-        27,
-        27
-      ]
+      "kernelSize": [5, 5],
+      "stride": [1, 1],
+      "padding": [2, 2],
+      "outputShape": [64, 256, 27, 27]
     },
     {
       "id": "conv2_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": [
-        "B",
-        256,
-        27,
-        27
-      ],
-      "outputShape": [
-        "B",
-        256,
-        27,
-        27
-      ]
+      "outputShape": [64, 256, 27, 27]
     },
     {
       "id": "lrn2",
@@ -168,36 +84,17 @@
       "alpha": 0.0001,
       "beta": 0.75,
       "k": 2,
-      "outputShape": [
-        "B",
-        256,
-        27,
-        27
-      ]
+      "outputShape": [64, 256, 27, 27]
     },
     {
       "id": "pool2",
       "name": "池化层-2",
       "type": "maxpool2d",
       "description": "进一步缩小特征图的尺寸，减少计算量，并增强特征的鲁棒性。",
-      "poolSize": [
-        3,
-        3
-      ],
-      "stride": [
-        2,
-        2
-      ],
-      "padding": [
-        0,
-        0
-      ],
-      "outputShape": [
-        "B",
-        256,
-        13,
-        13
-      ]
+      "poolSize": [3, 3],
+      "stride": [2, 2],
+      "padding": [0, 0],
+      "outputShape": [64, 256, 13, 13]
     },
     {
       "id": "conv3",
@@ -205,42 +102,17 @@
       "type": "conv2d",
       "description": "连续的卷积层之一，使用更小的卷积核来加深网络，学习更深层次的特征。",
       "filters": 384,
-      "kernelSize": [
-        3,
-        3
-      ],
-      "stride": [
-        1,
-        1
-      ],
-      "padding": [
-        1,
-        1
-      ],
-      "outputShape": [
-        "B",
-        384,
-        13,
-        13
-      ]
+      "kernelSize": [3, 3],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "outputShape": [64, 384, 13, 13]
     },
     {
       "id": "conv3_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": [
-        "B",
-        384,
-        13,
-        13
-      ],
-      "outputShape": [
-        "B",
-        384,
-        13,
-        13
-      ]
+      "outputShape": [64, 384, 13, 13]
     },
     {
       "id": "conv4",
@@ -248,42 +120,17 @@
       "type": "conv2d",
       "description": "与第三层结构类似，继续提取更复杂的特征表示。",
       "filters": 384,
-      "kernelSize": [
-        3,
-        3
-      ],
-      "stride": [
-        1,
-        1
-      ],
-      "padding": [
-        1,
-        1
-      ],
-      "outputShape": [
-        "B",
-        384,
-        13,
-        13
-      ]
+      "kernelSize": [3, 3],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "outputShape": [64, 384, 13, 13]
     },
     {
       "id": "conv4_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": [
-        "B",
-        384,
-        13,
-        13
-      ],
-      "outputShape": [
-        "B",
-        384,
-        13,
-        13
-      ]
+      "outputShape": [64, 384, 13, 13]
     },
     {
       "id": "conv5",
@@ -291,100 +138,48 @@
       "type": "conv2d",
       "description": "最后一个卷积层，为即将到来的全连接层准备最终的特征图。",
       "filters": 256,
-      "kernelSize": [
-        3,
-        3
-      ],
-      "stride": [
-        1,
-        1
-      ],
-      "padding": [
-        1,
-        1
-      ],
-      "outputShape": [
-        "B",
-        256,
-        13,
-        13
-      ]
+      "kernelSize": [3, 3],
+      "stride": [1, 1],
+      "padding": [1, 1],
+      "outputShape": [64, 256, 13, 13]
     },
     {
       "id": "conv5_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": [
-        "B",
-        256,
-        13,
-        13
-      ],
-      "outputShape": [
-        "B",
-        256,
-        13,
-        13
-      ]
+      "outputShape": [64, 256, 13, 13]
     },
     {
       "id": "pool3",
       "name": "池化层-3",
       "type": "maxpool2d",
       "description": "最后一次下采样，将特征图压缩到适合全连接层处理的大小。",
-      "poolSize": [
-        3,
-        3
-      ],
-      "stride": [
-        2,
-        2
-      ],
-      "padding": [
-        0,
-        0
-      ],
-      "outputShape": [
-        "B",
-        256,
-        6,
-        6
-      ]
+      "poolSize": [3, 3],
+      "stride": [2, 2],
+      "padding": [0, 0],
+      "outputShape": [64, 256, 6, 6]
     },
     {
       "id": "flatten",
       "name": "展平层",
       "type": "flatten",
       "description": "将卷积层提取的二维特征图“压平”成一维向量",
-      "outputShape": [
-        "B",
-        9216
-      ]
+      "outputShape": [64, 9216]
     },
     {
       "id": "fc1",
       "name": "全连接层-1",
       "type": "linear",
       "description": "使用全连接层进行高级特征的组合与分类。",
-      "outputShape": [
-        "B",
-        4096
-      ]
+      "outputShape": [64, 4096]
     },
     {
       "id": "fc1_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": [
-        "B",
-        4096
-      ],
-      "outputShape": [
-        "B",
-        4096
-      ]
+      "outputShape": [64, 4096]
     },
     {
       "id": "dropout1",
@@ -392,34 +187,21 @@
       "type": "dropout",
       "description": "在训练期间随机“丢弃”一部分神经元，防止神经元之间过度依赖，从而减轻过拟合。",
       "rate": 0.5,
-      "outputShape": [
-        "B",
-        4096
-      ]
+      "outputShape": [64, 4096]
     },
     {
       "id": "fc2",
       "name": "全连接层-2",
       "type": "linear",
       "description": "进一步整合特征，增强模型的非线性表达能力。",
-      "outputShape": [
-        "B",
-        4096
-      ]
+      "outputShape": [64, 4096]
     },
     {
       "id": "fc2_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": [
-        "B",
-        4096
-      ],
-      "outputShape": [
-        "B",
-        4096
-      ]
+      "outputShape": [64, 4096]
     },
     {
       "id": "dropout2",
@@ -427,34 +209,21 @@
       "type": "dropout",
       "description": "再次使用Dropout技术以增强模型的泛化能力。",
       "rate": 0.5,
-      "outputShape": [
-        "B",
-        4096
-      ]
+      "outputShape": [64, 4096]
     },
     {
       "id": "output",
       "name": "输出层",
       "type": "linear",
       "description": "最终的分类层，将特征映射到1000个类别（针对ImageNet数据集），Softmax函数输出每个类别的概率。",
-      "outputShape": [
-        "B",
-        1000
-      ]
+      "outputShape": [64, 1000]
     },
     {
       "id": "output_act",
       "name": "Softmax 激活",
       "type": "softmax",
       "activation": "softmax",
-      "inputShape": [
-        "B",
-        1000
-      ],
-      "outputShape": [
-        "B",
-        1000
-      ]
+      "outputShape": [64, 1000]
     }
   ],
   "edges": [

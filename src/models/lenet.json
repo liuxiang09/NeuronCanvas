@@ -23,7 +23,7 @@
       "name": "输入层",
       "type": "input",
       "description": "接收32x32像素的单通道灰度图像。",
-      "shape": ["B", 1, 32, 32]
+      "outputShape": [64, 1, 32, 32]
     },
     {
       "id": "c1",
@@ -34,15 +34,14 @@
       "kernelSize": [5, 5],
       "stride": [1, 1],
       "padding": [0, 0],
-      "outputShape": ["B", 6, 28, 28]
+      "outputShape": [64, 6, 28, 28]
     },
     {
       "id": "c1_act",
       "name": "Tanh 激活",
       "type": "tanh",
       "activation": "tanh",
-      "inputShape": ["B", 6, 28, 28],
-      "outputShape": ["B", 6, 28, 28]
+      "outputShape": [64, 6, 28, 28]
     },
     {
       "id": "s2",
@@ -52,7 +51,7 @@
       "poolSize": [2, 2],
       "stride": [2, 2],
       "padding": [0, 0],
-      "outputShape": ["B", 6, 14, 14]
+      "outputShape": [64, 6, 14, 14]
     },
     {
       "id": "c3",
@@ -63,15 +62,14 @@
       "kernelSize": [5, 5],
       "stride": [1, 1],
       "padding": [0, 0],
-      "outputShape": ["B", 16, 10, 10]
+      "outputShape": [64, 16, 10, 10]
     },
     {
       "id": "c3_act",
       "name": "Tanh 激活",
       "type": "tanh",
       "activation": "tanh",
-      "inputShape": ["B", 16, 10, 10],
-      "outputShape": ["B", 16, 10, 10]
+      "outputShape": [64, 16, 10, 10]
     },
     {
       "id": "s4",
@@ -81,7 +79,7 @@
       "poolSize": [2, 2],
       "stride": [2, 2],
       "padding": [0, 0],
-      "outputShape": ["B", 16, 5, 5]
+      "outputShape": [64, 16, 5, 5]
     },
     {
       "id": "c5",
@@ -92,52 +90,49 @@
       "kernelSize": [5, 5],
       "stride": [1, 1],
       "padding": [0, 0],
-      "outputShape": ["B", 120, 1, 1]
+      "outputShape": [64, 120, 1, 1]
     },
     {
       "id": "c5_act",
       "name": "Tanh 激活",
       "type": "tanh",
       "activation": "tanh",
-      "inputShape": ["B", 120, 1, 1],
-      "outputShape": ["B", 120, 1, 1]
+      "outputShape": [64, 120, 1, 1]
     },
     {
       "id": "flatten",
       "name": "展平层",
       "type": "flatten",
       "description": "将特征图展平为一维向量",
-      "outputShape": ["B", 120]
+      "outputShape": [64, 120]
     },
     {
       "id": "f6",
       "name": "全连接层F6",
       "type": "linear",
       "description": "将前一层的高级特征进行组合，为最终的分类任务做准备。",
-      "outputShape": ["B", 84]
+      "outputShape": [64, 84]
     },
     {
       "id": "f6_act",
       "name": "Tanh 激活",
       "type": "tanh",
       "activation": "tanh",
-      "inputShape": ["B", 84],
-      "outputShape": ["B", 84]
+      "outputShape": [64, 84]
     },
     {
       "id": "output",
       "name": "输出层",
       "type": "linear",
       "description": "最终的输出层，有10个神经元，分别对应0到9这10个数字的概率。",
-      "outputShape": ["B", 10]
+      "outputShape": [64, 10]
     },
     {
       "id": "output_act",
       "name": "Softmax 激活",
       "type": "softmax",
       "activation": "softmax",
-      "inputShape": ["B", 10],
-      "outputShape": ["B", 10]
+      "outputShape": [64, 10]
     }
   ],
   "edges": [

@@ -13,6 +13,7 @@ export interface CanvasActions {
   zoomIn?: () => void
   zoomOut?: () => void
   fitView?: () => void
+  autoLayout?: () => void
 }
 
 /**

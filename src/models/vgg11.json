@@ -18,7 +18,7 @@
       "name": "输入层",
       "type": "input",
       "description": "224×224 RGB 图像",
-      "shape": ["B", 3, 224, 224]
+      "outputShape": [64, 3, 224, 224]
     },
     {
       "id": "conv1",
@@ -28,15 +28,14 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
-      "outputShape": ["B", 64, 224, 224]
+      "outputShape": [64, 64, 224, 224]
     },
     {
       "id": "conv1_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 64, 224, 224],
-      "outputShape": ["B", 64, 224, 224]
+      "outputShape": [64, 64, 224, 224]
     },
     {
       "id": "pool1",
@@ -44,7 +43,7 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": ["B", 64, 112, 112]
+      "outputShape": [64, 64, 112, 112]
     },
     {
       "id": "conv2",
@@ -54,15 +53,14 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
-      "outputShape": ["B", 128, 112, 112]
+      "outputShape": [64, 128, 112, 112]
     },
     {
       "id": "conv2_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 128, 112, 112],
-      "outputShape": ["B", 128, 112, 112]
+      "outputShape": [64, 128, 112, 112]
     },
     {
       "id": "pool2",
@@ -70,7 +68,7 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": ["B", 128, 56, 56]
+      "outputShape": [64, 128, 56, 56]
     },
     {
       "id": "conv3_1",
@@ -80,15 +78,14 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
-      "outputShape": ["B", 256, 56, 56]
+      "outputShape": [64, 256, 56, 56]
     },
     {
       "id": "conv3_1_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 256, 56, 56],
-      "outputShape": ["B", 256, 56, 56]
+      "outputShape": [64, 256, 56, 56]
     },
     {
       "id": "conv3_2",
@@ -98,15 +95,14 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
-      "outputShape": ["B", 256, 56, 56]
+      "outputShape": [64, 256, 56, 56]
     },
     {
       "id": "conv3_2_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 256, 56, 56],
-      "outputShape": ["B", 256, 56, 56]
+      "outputShape": [64, 256, 56, 56]
     },
     {
       "id": "pool3",
@@ -114,7 +110,7 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": ["B", 256, 28, 28]
+      "outputShape": [64, 256, 28, 28]
     },
     {
       "id": "conv4_1",
@@ -124,15 +120,14 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
-      "outputShape": ["B", 512, 28, 28]
+      "outputShape": [64, 512, 28, 28]
     },
     {
       "id": "conv4_1_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 512, 28, 28],
-      "outputShape": ["B", 512, 28, 28]
+      "outputShape": [64, 512, 28, 28]
     },
     {
       "id": "conv4_2",
@@ -142,15 +137,14 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
-      "outputShape": ["B", 512, 28, 28]
+      "outputShape": [64, 512, 28, 28]
     },
     {
       "id": "conv4_2_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 512, 28, 28],
-      "outputShape": ["B", 512, 28, 28]
+      "outputShape": [64, 512, 28, 28]
     },
     {
       "id": "pool4",
@@ -158,7 +152,7 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": ["B", 512, 14, 14]
+      "outputShape": [64, 512, 14, 14]
     },
     {
       "id": "conv5_1",
@@ -168,15 +162,14 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
-      "outputShape": ["B", 512, 14, 14]
+      "outputShape": [64, 512, 14, 14]
     },
     {
       "id": "conv5_1_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 512, 14, 14],
-      "outputShape": ["B", 512, 14, 14]
+      "outputShape": [64, 512, 14, 14]
     },
     {
       "id": "conv5_2",
@@ -186,15 +179,14 @@
       "kernelSize": [3, 3],
       "stride": [1, 1],
       "padding": [1, 1],
-      "outputShape": ["B", 512, 14, 14]
+      "outputShape": [64, 512, 14, 14]
     },
     {
       "id": "conv5_2_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 512, 14, 14],
-      "outputShape": ["B", 512, 14, 14]
+      "outputShape": [64, 512, 14, 14]
     },
     {
       "id": "pool5",
@@ -202,58 +194,55 @@
       "type": "maxpool2d",
       "poolSize": [2, 2],
       "stride": [2, 2],
-      "outputShape": ["B", 512, 7, 7]
+      "outputShape": [64, 512, 7, 7]
     },
     {
       "id": "flatten",
       "name": "Flatten",
       "type": "flatten",
-      "outputShape": ["B", 25088]
+      "outputShape": [64, 25088]
     },
     {
       "id": "fc1",
       "name": "FC 1",
       "type": "linear",
       "units": 4096,
-      "outputShape": ["B", 4096]
+      "outputShape": [64, 4096]
     },
     {
       "id": "fc1_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 4096],
-      "outputShape": ["B", 4096]
+      "outputShape": [64, 4096]
     },
     {
       "id": "fc2",
       "name": "FC 2",
       "type": "linear",
       "units": 4096,
-      "outputShape": ["B", 4096]
+      "outputShape": [64, 4096]
     },
     {
       "id": "fc2_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 4096],
-      "outputShape": ["B", 4096]
+      "outputShape": [64, 4096]
     },
     {
       "id": "fc3",
       "name": "FC 3",
       "type": "linear",
       "units": 1000,
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     },
     {
       "id": "fc3_act",
       "name": "ReLU 激活",
       "type": "relu",
       "activation": "relu",
-      "inputShape": ["B", 1000],
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     },
     {
       "id": "output",

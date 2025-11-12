@@ -18,7 +18,7 @@
       "name": "输入层",
       "type": "input",
       "description": "网络的入口，接收一批224x224像素的RGB三通道图像。",
-      "shape": ["B", 3, 224, 224]
+      "outputShape": [64, 3, 224, 224]
     },
     {
       "id": "conv1",
@@ -29,21 +29,21 @@
       "kernelSize": [7, 7],
       "stride": [2, 2],
       "padding": [3, 3],
-      "outputShape": ["B", 64, 112, 112]
+      "outputShape": [64, 64, 112, 112]
     },
     {
       "id": "bn1",
       "name": "批归一化层-1",
       "type": "batchnorm",
       "description": "对第一个卷积层的输出进行归一化，以加速模型训练。",
-      "outputShape": ["B", 64, 112, 112]
+      "outputShape": [64, 64, 112, 112]
     },
     {
       "id": "relu1",
       "name": "激活函数-1 (ReLU)",
       "type": "relu",
       "description": "对归一化后的数据进行ReLU非线性激活。",
-      "outputShape": ["B", 64, 112, 112],
+      "outputShape": [64, 64, 112, 112],
       "activation": "relu"
     },
     {
@@ -54,17 +54,16 @@
       "poolSize": [3, 3],
       "stride": [2, 2],
       "padding": [1, 1],
-      "outputShape": ["B", 64, 56, 56]
+      "outputShape": [64, 64, 56, 56]
     },
     {
       "id": "layer1_0_block",
       "name": "并行残差块 Layer1.0",
       "type": "parallel",
       "description": "使用 Parallel 结构封装的残差块 Layer1.0",
-      "inputShape": ["B", 64, 56, 56],
       "outputShape": [
-        ["B", 64, 56, 56],
-        ["B", 64, 56, 56]
+        [64, 64, 56, 56],
+        [64, 64, 56, 56]
       ],
       "branches": [
         {
@@ -80,21 +79,21 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 64, 56, 56]
+              "outputShape": [64, 64, 56, 56]
             },
             {
               "id": "layer1_0_bn1",
               "name": "批归一化层-1.0.1",
               "type": "batchnorm",
               "description": "对残差块1.0的第一个卷积输出进行归一化处理。",
-              "outputShape": ["B", 64, 56, 56]
+              "outputShape": [64, 64, 56, 56]
             },
             {
               "id": "layer1_0_relu1",
               "name": "激活函数-1.0.1 (ReLU)",
               "type": "relu",
               "description": "对数据进行第一次非线性激活。",
-              "outputShape": ["B", 64, 56, 56],
+              "outputShape": [64, 64, 56, 56],
               "activation": "relu"
             },
             {
@@ -106,23 +105,23 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 64, 56, 56]
+              "outputShape": [64, 64, 56, 56]
             },
             {
               "id": "layer1_0_bn2",
               "name": "批归一化层-1.0.2",
               "type": "batchnorm",
               "description": "对残差块1.0的第二个卷积输出进行归一化处理。",
-              "outputShape": ["B", 64, 56, 56]
+              "outputShape": [64, 64, 56, 56]
             }
           ],
-          "outputShape": ["B", 64, 56, 56]
+          "outputShape": [64, 64, 56, 56]
         },
         {
           "id": "layer1_0_block_skip_branch",
           "name": "捷径分支",
           "steps": [],
-          "outputShape": ["B", 64, 56, 56]
+          "outputShape": [64, 64, 56, 56]
         }
       ]
     },
@@ -131,14 +130,14 @@
       "name": "残差连接-1.0 (相加)",
       "type": "add",
       "description": "将残差块的输入与主路径的输出进行逐元素相加。",
-      "outputShape": ["B", 64, 56, 56]
+      "outputShape": [64, 64, 56, 56]
     },
     {
       "id": "layer1_0_relu_out",
       "name": "激活函数-1.0 (输出)",
       "type": "relu",
       "description": "对残差相加后的结果进行最终的ReLU激活。",
-      "outputShape": ["B", 64, 56, 56],
+      "outputShape": [64, 64, 56, 56],
       "activation": "relu"
     },
     {
@@ -146,10 +145,9 @@
       "name": "并行残差块 Layer1.1",
       "type": "parallel",
       "description": "使用 Parallel 结构封装的残差块 Layer1.1",
-      "inputShape": ["B", 64, 56, 56],
       "outputShape": [
-        ["B", 64, 56, 56],
-        ["B", 64, 56, 56]
+        [64, 64, 56, 56],
+        [64, 64, 56, 56]
       ],
       "branches": [
         {
@@ -165,21 +163,21 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 64, 56, 56]
+              "outputShape": [64, 64, 56, 56]
             },
             {
               "id": "layer1_1_bn1",
               "name": "批归一化层-1.1.1",
               "type": "batchnorm",
               "description": "对残差块1.1的第一个卷积输出进行归一化处理。",
-              "outputShape": ["B", 64, 56, 56]
+              "outputShape": [64, 64, 56, 56]
             },
             {
               "id": "layer1_1_relu1",
               "name": "激活函数-1.1.1 (ReLU)",
               "type": "relu",
               "description": "对数据进行第一次非线性激活。",
-              "outputShape": ["B", 64, 56, 56],
+              "outputShape": [64, 64, 56, 56],
               "activation": "relu"
             },
             {
@@ -191,23 +189,23 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 64, 56, 56]
+              "outputShape": [64, 64, 56, 56]
             },
             {
               "id": "layer1_1_bn2",
               "name": "批归一化层-1.1.2",
               "type": "batchnorm",
               "description": "对残差块1.1的第二个卷积输出进行归一化处理。",
-              "outputShape": ["B", 64, 56, 56]
+              "outputShape": [64, 64, 56, 56]
             }
           ],
-          "outputShape": ["B", 64, 56, 56]
+          "outputShape": [64, 64, 56, 56]
         },
         {
           "id": "layer1_1_block_skip_branch",
           "name": "捷径分支",
           "steps": [],
-          "outputShape": ["B", 64, 56, 56]
+          "outputShape": [64, 64, 56, 56]
         }
       ]
     },
@@ -216,14 +214,14 @@
       "name": "残差连接-1.1 (相加)",
       "type": "add",
       "description": "将残差块的输入与主路径的输出进行逐元素相加。",
-      "outputShape": ["B", 64, 56, 56]
+      "outputShape": [64, 64, 56, 56]
     },
     {
       "id": "layer1_1_relu_out",
       "name": "激活函数-1.1 (输出)",
       "type": "relu",
       "description": "对残差相加后的结果进行最终的ReLU激活。",
-      "outputShape": ["B", 64, 56, 56],
+      "outputShape": [64, 64, 56, 56],
       "activation": "relu"
     },
     {
@@ -231,10 +229,9 @@
       "name": "并行残差块 Layer2.0",
       "type": "parallel",
       "description": "使用 Parallel 结构封装的残差块 Layer2.0",
-      "inputShape": ["B", 128, 28, 28],
       "outputShape": [
-        ["B", 128, 28, 28],
-        ["B", 128, 28, 28]
+        [64, 128, 28, 28],
+        [64, 128, 28, 28]
       ],
       "branches": [
         {
@@ -250,21 +247,21 @@
               "kernelSize": [3, 3],
               "stride": [2, 2],
               "padding": [1, 1],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "layer2_0_bn1",
               "name": "批归一化层-2.0.1",
               "type": "batchnorm",
               "description": "对残差块2.0的第一个卷积输出进行归一化处理。",
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "layer2_0_relu1",
               "name": "激活函数-2.0.1 (ReLU)",
               "type": "relu",
               "description": "对数据进行第一次非线性激活。",
-              "outputShape": ["B", 128, 28, 28],
+              "outputShape": [64, 128, 28, 28],
               "activation": "relu"
             },
             {
@@ -276,17 +273,17 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "layer2_0_bn2",
               "name": "批归一化层-2.0.2",
               "type": "batchnorm",
               "description": "对残差块2.0的第二个卷积输出进行归一化处理。",
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             }
           ],
-          "outputShape": ["B", 128, 28, 28]
+          "outputShape": [64, 128, 28, 28]
         },
         {
           "id": "layer2_0_block_skip_branch",
@@ -301,17 +298,17 @@
               "kernelSize": [1, 1],
               "stride": [2, 2],
               "padding": [0, 0],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "layer2_0_downsample_bn",
               "name": "投影归一化层-2.0",
               "type": "batchnorm",
               "description": "对投影卷积的输出进行归一化处理。",
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             }
           ],
-          "outputShape": ["B", 128, 28, 28]
+          "outputShape": [64, 128, 28, 28]
         }
       ]
     },
@@ -320,14 +317,14 @@
       "name": "残差连接-2.0 (相加)",
       "type": "add",
       "description": "将经过投影的残差连接与主路径的输出进行相加。",
-      "outputShape": ["B", 128, 28, 28]
+      "outputShape": [64, 128, 28, 28]
     },
     {
       "id": "layer2_0_relu_out",
       "name": "激活函数-2.0 (输出)",
       "type": "relu",
       "description": "对残差相加后的结果进行最终的ReLU激活。",
-      "outputShape": ["B", 128, 28, 28],
+      "outputShape": [64, 128, 28, 28],
       "activation": "relu"
     },
     {
@@ -335,10 +332,9 @@
       "name": "并行残差块 Layer2.1",
       "type": "parallel",
       "description": "使用 Parallel 结构封装的残差块 Layer2.1",
-      "inputShape": ["B", 128, 28, 28],
       "outputShape": [
-        ["B", 128, 28, 28],
-        ["B", 128, 28, 28]
+        [64, 128, 28, 28],
+        [64, 128, 28, 28]
       ],
       "branches": [
         {
@@ -354,21 +350,21 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "layer2_1_bn1",
               "name": "批归一化层-2.1.1",
               "type": "batchnorm",
               "description": "对残差块2.1的第一个卷积输出进行归一化处理。",
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "layer2_1_relu1",
               "name": "激活函数-2.1.1 (ReLU)",
               "type": "relu",
               "description": "对数据进行第一次非线性激活。",
-              "outputShape": ["B", 128, 28, 28],
+              "outputShape": [64, 128, 28, 28],
               "activation": "relu"
             },
             {
@@ -380,23 +376,23 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             },
             {
               "id": "layer2_1_bn2",
               "name": "批归一化层-2.1.2",
               "type": "batchnorm",
               "description": "对残差块2.1的第二个卷积输出进行归一化处理。",
-              "outputShape": ["B", 128, 28, 28]
+              "outputShape": [64, 128, 28, 28]
             }
           ],
-          "outputShape": ["B", 128, 28, 28]
+          "outputShape": [64, 128, 28, 28]
         },
         {
           "id": "layer2_1_block_skip_branch",
           "name": "捷径分支",
           "steps": [],
-          "outputShape": ["B", 128, 28, 28]
+          "outputShape": [64, 128, 28, 28]
         }
       ]
     },
@@ -405,14 +401,14 @@
       "name": "残差连接-2.1 (相加)",
       "type": "add",
       "description": "将残差块的输入与主路径的输出进行逐元素相加。",
-      "outputShape": ["B", 128, 28, 28]
+      "outputShape": [64, 128, 28, 28]
     },
     {
       "id": "layer2_1_relu_out",
       "name": "激活函数-2.1 (输出)",
       "type": "relu",
       "description": "对残差相加后的结果进行最终的ReLU激活。",
-      "outputShape": ["B", 128, 28, 28],
+      "outputShape": [64, 128, 28, 28],
       "activation": "relu"
     },
     {
@@ -420,10 +416,9 @@
       "name": "并行残差块 Layer3.0",
       "type": "parallel",
       "description": "使用 Parallel 结构封装的残差块 Layer3.0",
-      "inputShape": ["B", "B", 14, 14],
       "outputShape": [
-        ["B", "B", 14, 14],
-        ["B", "B", 14, 14]
+        [64, 64, 14, 14],
+        [64, 64, 14, 14]
       ],
       "branches": [
         {
@@ -435,25 +430,25 @@
               "name": "卷积层-3.0.1",
               "type": "conv2d",
               "description": "残差块3.0的第一个3x3卷积层，步长为2，进行下采样。",
-              "filters": "B",
+              "filters": 64,
               "kernelSize": [3, 3],
               "stride": [2, 2],
               "padding": [1, 1],
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             },
             {
               "id": "layer3_0_bn1",
               "name": "批归一化层-3.0.1",
               "type": "batchnorm",
               "description": "对残差块3.0的第一个卷积输出进行归一化处理。",
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             },
             {
               "id": "layer3_0_relu1",
               "name": "激活函数-3.0.1 (ReLU)",
               "type": "relu",
               "description": "对数据进行第一次非线性激活。",
-              "outputShape": ["B", "B", 14, 14],
+              "outputShape": [64, 64, 14, 14],
               "activation": "relu"
             },
             {
@@ -461,21 +456,21 @@
               "name": "卷积层-3.0.2",
               "type": "conv2d",
               "description": "残差块3.0的第二个3x3卷积层。",
-              "filters": "B",
+              "filters": 64,
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             },
             {
               "id": "layer3_0_bn2",
               "name": "批归一化层-3.0.2",
               "type": "batchnorm",
               "description": "对残差块3.0的第二个卷积输出进行归一化处理。",
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             }
           ],
-          "outputShape": ["B", "B", 14, 14]
+          "outputShape": [64, 64, 14, 14]
         },
         {
           "id": "layer3_0_block_skip_branch",
@@ -486,21 +481,21 @@
               "name": "投影卷积层-3.0",
               "type": "conv2d",
               "description": "在残差连接上使用1x1卷积进行下采样和维度匹配。",
-              "filters": "B",
+              "filters": 64,
               "kernelSize": [1, 1],
               "stride": [2, 2],
               "padding": [0, 0],
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             },
             {
               "id": "layer3_0_downsample_bn",
               "name": "投影归一化层-3.0",
               "type": "batchnorm",
               "description": "对投影卷积的输出进行归一化处理。",
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             }
           ],
-          "outputShape": ["B", "B", 14, 14]
+          "outputShape": [64, 64, 14, 14]
         }
       ]
     },
@@ -509,14 +504,14 @@
       "name": "残差连接-3.0 (相加)",
       "type": "add",
       "description": "将经过投影的残差连接与主路径的输出进行相加。",
-      "outputShape": ["B", "B", 14, 14]
+      "outputShape": [64, 64, 14, 14]
     },
     {
       "id": "layer3_0_relu_out",
       "name": "激活函数-3.0 (输出)",
       "type": "relu",
       "description": "对残差相加后的结果进行最终的ReLU激活。",
-      "outputShape": ["B", "B", 14, 14],
+      "outputShape": [64, 64, 14, 14],
       "activation": "relu"
     },
     {
@@ -524,10 +519,9 @@
       "name": "并行残差块 Layer3.1",
       "type": "parallel",
       "description": "使用 Parallel 结构封装的残差块 Layer3.1",
-      "inputShape": ["B", "B", 14, 14],
       "outputShape": [
-        ["B", "B", 14, 14],
-        ["B", "B", 14, 14]
+        [64, 64, 14, 14],
+        [64, 64, 14, 14]
       ],
       "branches": [
         {
@@ -539,25 +533,25 @@
               "name": "卷积层-3.1.1",
               "type": "conv2d",
               "description": "残差块3.1的第一个3x3卷积层。",
-              "filters": "B",
+              "filters": 64,
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             },
             {
               "id": "layer3_1_bn1",
               "name": "批归一化层-3.1.1",
               "type": "batchnorm",
               "description": "对残差块3.1的第一个卷积输出进行归一化处理。",
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             },
             {
               "id": "layer3_1_relu1",
               "name": "激活函数-3.1.1 (ReLU)",
               "type": "relu",
               "description": "对数据进行第一次非线性激活。",
-              "outputShape": ["B", "B", 14, 14],
+              "outputShape": [64, 64, 14, 14],
               "activation": "relu"
             },
             {
@@ -565,27 +559,27 @@
               "name": "卷积层-3.1.2",
               "type": "conv2d",
               "description": "残差块3.1的第二个3x3卷积层。",
-              "filters": "B",
+              "filters": 64,
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             },
             {
               "id": "layer3_1_bn2",
               "name": "批归一化层-3.1.2",
               "type": "batchnorm",
               "description": "对残差块3.1的第二个卷积输出进行归一化处理。",
-              "outputShape": ["B", "B", 14, 14]
+              "outputShape": [64, 64, 14, 14]
             }
           ],
-          "outputShape": ["B", "B", 14, 14]
+          "outputShape": [64, 64, 14, 14]
         },
         {
           "id": "layer3_1_block_skip_branch",
           "name": "捷径分支",
           "steps": [],
-          "outputShape": ["B", "B", 14, 14]
+          "outputShape": [64, 64, 14, 14]
         }
       ]
     },
@@ -594,14 +588,14 @@
       "name": "残差连接-3.1 (相加)",
       "type": "add",
       "description": "将残差块的输入与主路径的输出进行逐元素相加。",
-      "outputShape": ["B", "B", 14, 14]
+      "outputShape": [64, 64, 14, 14]
     },
     {
       "id": "layer3_1_relu_out",
       "name": "激活函数-3.1 (输出)",
       "type": "relu",
       "description": "对残差相加后的结果进行最终的ReLU激活。",
-      "outputShape": ["B", "B", 14, 14],
+      "outputShape": [64, 64, 14, 14],
       "activation": "relu"
     },
     {
@@ -609,10 +603,9 @@
       "name": "并行残差块 Layer4.0",
       "type": "parallel",
       "description": "使用 Parallel 结构封装的残差块 Layer4.0",
-      "inputShape": ["B", 512, 7, 7],
       "outputShape": [
-        ["B", 512, 7, 7],
-        ["B", 512, 7, 7]
+        [64, 512, 7, 7],
+        [64, 512, 7, 7]
       ],
       "branches": [
         {
@@ -628,21 +621,21 @@
               "kernelSize": [3, 3],
               "stride": [2, 2],
               "padding": [1, 1],
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             },
             {
               "id": "layer4_0_bn1",
               "name": "批归一化层-4.0.1",
               "type": "batchnorm",
               "description": "对残差块4.0的第一个卷积输出进行归一化处理。",
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             },
             {
               "id": "layer4_0_relu1",
               "name": "激活函数-4.0.1 (ReLU)",
               "type": "relu",
               "description": "对数据进行第一次非线性激活。",
-              "outputShape": ["B", 512, 7, 7],
+              "outputShape": [64, 512, 7, 7],
               "activation": "relu"
             },
             {
@@ -654,17 +647,17 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             },
             {
               "id": "layer4_0_bn2",
               "name": "批归一化层-4.0.2",
               "type": "batchnorm",
               "description": "对残差块4.0的第二个卷积输出进行归一化处理。",
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             }
           ],
-          "outputShape": ["B", 512, 7, 7]
+          "outputShape": [64, 512, 7, 7]
         },
         {
           "id": "layer4_0_block_skip_branch",
@@ -679,17 +672,17 @@
               "kernelSize": [1, 1],
               "stride": [2, 2],
               "padding": [0, 0],
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             },
             {
               "id": "layer4_0_downsample_bn",
               "name": "投影归一化层-4.0",
               "type": "batchnorm",
               "description": "对投影卷积的输出进行归一化处理。",
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             }
           ],
-          "outputShape": ["B", 512, 7, 7]
+          "outputShape": [64, 512, 7, 7]
         }
       ]
     },
@@ -698,14 +691,14 @@
       "name": "残差连接-4.0 (相加)",
       "type": "add",
       "description": "将经过投影的残差连接与主路径的输出进行相加。",
-      "outputShape": ["B", 512, 7, 7]
+      "outputShape": [64, 512, 7, 7]
     },
     {
       "id": "layer4_0_relu_out",
       "name": "激活函数-4.0 (输出)",
       "type": "relu",
       "description": "对残差相加后的结果进行最终的ReLU激活。",
-      "outputShape": ["B", 512, 7, 7],
+      "outputShape": [64, 512, 7, 7],
       "activation": "relu"
     },
     {
@@ -713,10 +706,9 @@
       "name": "并行残差块 Layer4.1",
       "type": "parallel",
       "description": "使用 Parallel 结构封装的残差块 Layer4.1",
-      "inputShape": ["B", 512, 7, 7],
       "outputShape": [
-        ["B", 512, 7, 7],
-        ["B", 512, 7, 7]
+        [64, 512, 7, 7],
+        [64, 512, 7, 7]
       ],
       "branches": [
         {
@@ -732,21 +724,21 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             },
             {
               "id": "layer4_1_bn1",
               "name": "批归一化层-4.1.1",
               "type": "batchnorm",
               "description": "对残差块4.1的第一个卷积输出进行归一化处理。",
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             },
             {
               "id": "layer4_1_relu1",
               "name": "激活函数-4.1.1 (ReLU)",
               "type": "relu",
               "description": "对数据进行第一次非线性激活。",
-              "outputShape": ["B", 512, 7, 7],
+              "outputShape": [64, 512, 7, 7],
               "activation": "relu"
             },
             {
@@ -758,23 +750,23 @@
               "kernelSize": [3, 3],
               "stride": [1, 1],
               "padding": [1, 1],
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             },
             {
               "id": "layer4_1_bn2",
               "name": "批归一化层-4.1.2",
               "type": "batchnorm",
               "description": "对残差块4.1的第二个卷积输出进行归一化处理。",
-              "outputShape": ["B", 512, 7, 7]
+              "outputShape": [64, 512, 7, 7]
             }
           ],
-          "outputShape": ["B", 512, 7, 7]
+          "outputShape": [64, 512, 7, 7]
         },
         {
           "id": "layer4_1_block_skip_branch",
           "name": "捷径分支",
           "steps": [],
-          "outputShape": ["B", 512, 7, 7]
+          "outputShape": [64, 512, 7, 7]
         }
       ]
     },
@@ -783,14 +775,14 @@
       "name": "残差连接-4.1 (相加)",
       "type": "add",
       "description": "将残差块的输入与主路径的输出进行逐元素相加。",
-      "outputShape": ["B", 512, 7, 7]
+      "outputShape": [64, 512, 7, 7]
     },
     {
       "id": "layer4_1_relu_out",
       "name": "激活函数-4.1 (输出)",
       "type": "relu",
       "description": "对残差相加后的结果进行最终的ReLU激活。",
-      "outputShape": ["B", 512, 7, 7],
+      "outputShape": [64, 512, 7, 7],
       "activation": "relu"
     },
     {
@@ -798,14 +790,14 @@
       "name": "全局平均池化层",
       "type": "adaptiveavgpool2d",
       "description": "将每个特征图缩减为一个单一数值，得到一个512维的特征向量。",
-      "outputShape": ["B", 512, 1, 1]
+      "outputShape": [64, 512, 1, 1]
     },
     {
       "id": "flatten",
       "name": "展平层",
       "type": "flatten",
       "description": "移除多余的维度以便将数据输入到全连接层。",
-      "outputShape": ["B", 512]
+      "outputShape": [64, 512]
     },
     {
       "id": "fc",
@@ -813,22 +805,21 @@
       "type": "linear",
       "description": "将512维特征映射到1000个分类类别上。",
       "units": 1000,
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     },
     {
       "id": "output",
       "name": "输出层",
       "type": "linear",
       "description": "通过Softmax函数计算最终每个类别的预测概率。",
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     },
     {
       "id": "output_act",
       "name": "Softmax 激活",
       "type": "softmax",
       "activation": "softmax",
-      "inputShape": ["B", 1000],
-      "outputShape": ["B", 1000]
+      "outputShape": [64, 1000]
     }
   ],
   "edges": [

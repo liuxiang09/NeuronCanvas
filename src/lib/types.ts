@@ -41,7 +41,7 @@ export type LayerType =
 /**
  * 所有层共同的基础字段
  *
- * - `inputShape`/`outputShape` 可为单形状或嵌套（如并行分支）
+ * - `outputShape` 可为单形状或嵌套（如并行分支）
  * - 具体层的专有字段在各自接口中定义
  */
 export interface LayerBase {
@@ -49,7 +49,6 @@ export interface LayerBase {
   name: string;
   type: LayerType;
   description?: string;
-  inputShape?: number[] | number[][];
   outputShape?: number[] | number[][];
 }
 
@@ -64,8 +63,7 @@ export interface Conv2DLayer extends LayerBase {
   filters: number;
   kernelSize: number[];
   stride?: number[];
-  padding?: number[];
-  activation?: ActivationType;
+  padding?: number[] ;
 }
 
 /** 最大池化层 */
@@ -111,11 +109,7 @@ export interface DropoutLayer extends LayerBase {
   rate: number;
 }
 
-/**
- * 归一化层
- *
- * 字段覆盖常见的归一化超参数，使用时按需填写即可。
- */
+/** 归一化层 */
 export interface NormLayer extends LayerBase {
   type: NormType;
 }
@@ -130,7 +124,6 @@ export interface AttentionLayer extends LayerBase {
   numHeads: number;
   headDim: number;
   modelDim: number;
-  usesMask?: boolean;
 }
 
 /** 加法层（用于残差连接） */
