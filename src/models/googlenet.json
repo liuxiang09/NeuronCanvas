@@ -14,7 +14,8 @@
     "paperTitle": "Going deeper with convolutions",
     "citations": 69967,
     "tags": ["CNN", "Inception", "图像分类", "多尺度", "ImageNet"],
-    "category": "CNN"
+    "category": ["CNN"],
+    "verified": false
   },
   "layers": [
     {
@@ -22,14 +23,14 @@
       "name": "输入层",
       "type": "input",
       "description": "接收224x224像素的RGB彩色图像。",
-      "shape": [224, 224, 3]
+      "shape": ["B", 3, 224, 224]
     },
     {
       "id": "stem_network",
       "name": "主干网络",
-      "type": "stem",
+      "type": "sequential",
       "description": "网络的主干部分，由一系列传统的卷积和池化层组成，用于在进入Inception模块前，快速降低图像的空间分辨率并提取基础特征。",
-      "outputShape": [28, 28, 192],
+      "outputShape": ["B", 192, 28, 28],
       "steps": [
         {
           "id": "conv1",
@@ -39,8 +40,15 @@
           "kernelSize": [7, 7],
           "stride": [2, 2],
           "padding": [3, 3],
+          "outputShape": ["B", 64, 112, 112]
+        },
+        {
+          "id": "conv1_act",
+          "name": "ReLU 激活",
+          "type": "relu",
           "activation": "relu",
-          "outputShape": [112, 112, 64]
+          "inputShape": ["B", 64, 112, 112],
+          "outputShape": ["B", 64, 112, 112]
         },
         {
           "id": "pool1",
@@ -49,7 +57,7 @@
           "poolSize": [3, 3],
           "stride": [2, 2],
           "padding": [1, 1],
-          "outputShape": [56, 56, 64]
+          "outputShape": ["B", 64, 56, 56]
         },
         {
           "id": "conv2",
@@ -59,8 +67,15 @@
           "kernelSize": [3, 3],
           "stride": [1, 1],
           "padding": [1, 1],
+          "outputShape": ["B", 192, 56, 56]
+        },
+        {
+          "id": "conv2_act",
+          "name": "ReLU 激活",
+          "type": "relu",
           "activation": "relu",
-          "outputShape": [56, 56, 192]
+          "inputShape": ["B", 192, 56, 56],
+          "outputShape": ["B", 192, 56, 56]
         },
         {
           "id": "pool2",
@@ -69,179 +84,347 @@
           "poolSize": [3, 3],
           "stride": [2, 2],
           "padding": [1, 1],
-          "outputShape": [28, 28, 192]
+          "outputShape": ["B", 192, 28, 28]
         }
       ]
     },
     {
-      "id": "inception3a_1x1",
-      "name": "分支 1",
-      "type": "conv2d",
-      "description": "64×1×1\n1 层",
-      "filters": 64,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 64]
-    },
-    {
-      "id": "inception3a_3x3_reduce",
-      "name": "分支 2",
-      "type": "conv2d",
-      "description": "96×1×1 → 128×3×3\n2 层",
-      "filters": 96,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 96]
-    },
-    {
-      "id": "inception3a_3x3",
-      "name": "分支 2",
-      "type": "conv2d",
-      "filters": 128,
-      "kernelSize": [3, 3],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 128]
-    },
-    {
-      "id": "inception3a_5x5_reduce",
-      "name": "分支 3",
-      "type": "conv2d",
-      "description": "16×1×1 → 32×5×5\n2 层",
-      "filters": 16,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 16]
-    },
-    {
-      "id": "inception3a_5x5",
-      "name": "分支 3",
-      "type": "conv2d",
-      "filters": 32,
-      "kernelSize": [5, 5],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 32]
-    },
-    {
-      "id": "inception3a_pool",
-      "name": "分支 4",
-      "type": "maxpool2d",
-      "description": "Pool 3×3 → 32×1×1\n2 层",
-      "poolSize": [3, 3],
-      "stride": [1, 1],
-      "outputShape": [28, 28, 192]
-    },
-    {
-      "id": "inception3a_pool_proj",
-      "name": "分支 4",
-      "type": "conv2d",
-      "filters": 32,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 32]
+      "id": "inception3a_parallel",
+      "name": "Inception INCEPTION3A Parallel",
+      "type": "parallel",
+      "description": "Inception 模块 inception3a 的并行分支",
+      "branches": [
+        {
+          "id": "inception3a_branch1_branch",
+          "name": "1×1 分支",
+          "steps": [
+            {
+              "id": "inception3a_1x1",
+              "name": "分支 1",
+              "type": "conv2d",
+              "description": "64×1×1\n1 层",
+              "filters": 64,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 64, 28, 28]
+            },
+            {
+              "id": "inception3a_1x1_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 64, 28, 28],
+              "outputShape": ["B", 64, 28, 28]
+            }
+          ],
+          "outputShape": ["B", 64, 28, 28]
+        },
+        {
+          "id": "inception3a_branch2_branch",
+          "name": "3×3 分支",
+          "steps": [
+            {
+              "id": "inception3a_3x3_reduce",
+              "name": "分支 2",
+              "type": "conv2d",
+              "description": "96×1×1 → 128×3×3\n2 层",
+              "filters": 96,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 96, 28, 28]
+            },
+            {
+              "id": "inception3a_3x3_reduce_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 96, 28, 28],
+              "outputShape": ["B", 96, 28, 28]
+            },
+            {
+              "id": "inception3a_3x3",
+              "name": "分支 2",
+              "type": "conv2d",
+              "filters": 128,
+              "kernelSize": [3, 3],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 128, 28, 28]
+            },
+            {
+              "id": "inception3a_3x3_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 128, 28, 28],
+              "outputShape": ["B", 128, 28, 28]
+            }
+          ],
+          "outputShape": ["B", 128, 28, 28]
+        },
+        {
+          "id": "inception3a_branch3_branch",
+          "name": "5×5 分支",
+          "steps": [
+            {
+              "id": "inception3a_5x5_reduce",
+              "name": "分支 3",
+              "type": "conv2d",
+              "description": "16×1×1 → 32×5×5\n2 层",
+              "filters": 16,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 16, 28, 28]
+            },
+            {
+              "id": "inception3a_5x5_reduce_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 16, 28, 28],
+              "outputShape": ["B", 16, 28, 28]
+            },
+            {
+              "id": "inception3a_5x5",
+              "name": "分支 3",
+              "type": "conv2d",
+              "filters": 32,
+              "kernelSize": [5, 5],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 32, 28, 28]
+            },
+            {
+              "id": "inception3a_5x5_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 32, 28, 28],
+              "outputShape": ["B", 32, 28, 28]
+            }
+          ],
+          "outputShape": ["B", 32, 28, 28]
+        },
+        {
+          "id": "inception3a_pool_branch",
+          "name": "池化分支",
+          "steps": [
+            {
+              "id": "inception3a_pool",
+              "name": "分支 4",
+              "type": "maxpool2d",
+              "description": "Pool 3×3 → 32×1×1\n2 层",
+              "poolSize": [3, 3],
+              "stride": [1, 1],
+              "outputShape": ["B", 192, 28, 28]
+            },
+            {
+              "id": "inception3a_pool_proj",
+              "name": "分支 4",
+              "type": "conv2d",
+              "filters": 32,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 32, 28, 28]
+            },
+            {
+              "id": "inception3a_pool_proj_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 32, 28, 28],
+              "outputShape": ["B", 32, 28, 28]
+            }
+          ],
+          "outputShape": ["B", 32, 28, 28]
+        }
+      ],
+      "outputShape": [
+        ["B", 64, 28, 28],
+        ["B", 128, 28, 28],
+        ["B", 32, 28, 28],
+        ["B", 32, 28, 28]
+      ]
     },
     {
       "id": "concat3a",
       "name": "concat3a",
       "type": "concat",
       "description": "第一个 Inception 模块，包含 4 个并行分支处理多尺度特征",
-      "outputShape": [28, 28, 256]
+      "outputShape": ["B", 256, 28, 28]
     },
     {
-      "id": "inception3b_1x1",
-      "name": "分支 1",
-      "type": "conv2d",
-      "description": "128×1×1\n1 层",
-      "filters": 128,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 128]
-    },
-    {
-      "id": "inception3b_3x3_reduce",
-      "name": "分支 2",
-      "type": "conv2d",
-      "description": "128×1×1 → 192×3×3\n2 层",
-      "filters": 128,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 128]
-    },
-    {
-      "id": "inception3b_3x3",
-      "name": "分支 2",
-      "type": "conv2d",
-      "filters": 192,
-      "kernelSize": [3, 3],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 192]
-    },
-    {
-      "id": "inception3b_5x5_reduce",
-      "name": "分支 3",
-      "type": "conv2d",
-      "description": "32×1×1 → 96×5×5\n2 层",
-      "filters": 32,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 32]
-    },
-    {
-      "id": "inception3b_5x5",
-      "name": "分支 3",
-      "type": "conv2d",
-      "filters": 96,
-      "kernelSize": [5, 5],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 96]
-    },
-    {
-      "id": "inception3b_pool",
-      "name": "分支 4",
-      "type": "maxpool2d",
-      "description": "Pool 3×3 → 64×1×1\n2 层",
-      "poolSize": [3, 3],
-      "stride": [1, 1],
-      "outputShape": [28, 28, 256]
-    },
-    {
-      "id": "inception3b_pool_proj",
-      "name": "分支 4",
-      "type": "conv2d",
-      "filters": 64,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [28, 28, 64]
+      "id": "inception3b_parallel",
+      "name": "Inception INCEPTION3B Parallel",
+      "type": "parallel",
+      "description": "Inception 模块 inception3b 的并行分支",
+      "branches": [
+        {
+          "id": "inception3b_branch1_branch",
+          "name": "1×1 分支",
+          "steps": [
+            {
+              "id": "inception3b_1x1",
+              "name": "分支 1",
+              "type": "conv2d",
+              "description": "128×1×1\n1 层",
+              "filters": 128,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 128, 28, 28]
+            },
+            {
+              "id": "inception3b_1x1_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 128, 28, 28],
+              "outputShape": ["B", 128, 28, 28]
+            }
+          ],
+          "outputShape": ["B", 128, 28, 28]
+        },
+        {
+          "id": "inception3b_branch2_branch",
+          "name": "3×3 分支",
+          "steps": [
+            {
+              "id": "inception3b_3x3_reduce",
+              "name": "分支 2",
+              "type": "conv2d",
+              "description": "128×1×1 → 192×3×3\n2 层",
+              "filters": 128,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 128, 28, 28]
+            },
+            {
+              "id": "inception3b_3x3_reduce_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 128, 28, 28],
+              "outputShape": ["B", 128, 28, 28]
+            },
+            {
+              "id": "inception3b_3x3",
+              "name": "分支 2",
+              "type": "conv2d",
+              "filters": 192,
+              "kernelSize": [3, 3],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 192, 28, 28]
+            },
+            {
+              "id": "inception3b_3x3_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 192, 28, 28],
+              "outputShape": ["B", 192, 28, 28]
+            }
+          ],
+          "outputShape": ["B", 192, 28, 28]
+        },
+        {
+          "id": "inception3b_branch3_branch",
+          "name": "5×5 分支",
+          "steps": [
+            {
+              "id": "inception3b_5x5_reduce",
+              "name": "分支 3",
+              "type": "conv2d",
+              "description": "32×1×1 → 96×5×5\n2 层",
+              "filters": 32,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 32, 28, 28]
+            },
+            {
+              "id": "inception3b_5x5_reduce_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 32, 28, 28],
+              "outputShape": ["B", 32, 28, 28]
+            },
+            {
+              "id": "inception3b_5x5",
+              "name": "分支 3",
+              "type": "conv2d",
+              "filters": 96,
+              "kernelSize": [5, 5],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 96, 28, 28]
+            },
+            {
+              "id": "inception3b_5x5_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 96, 28, 28],
+              "outputShape": ["B", 96, 28, 28]
+            }
+          ],
+          "outputShape": ["B", 96, 28, 28]
+        },
+        {
+          "id": "inception3b_pool_branch",
+          "name": "池化分支",
+          "steps": [
+            {
+              "id": "inception3b_pool",
+              "name": "分支 4",
+              "type": "maxpool2d",
+              "description": "Pool 3×3 → 64×1×1\n2 层",
+              "poolSize": [3, 3],
+              "stride": [1, 1],
+              "outputShape": ["B", 256, 28, 28]
+            },
+            {
+              "id": "inception3b_pool_proj",
+              "name": "分支 4",
+              "type": "conv2d",
+              "filters": 64,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 64, 28, 28]
+            },
+            {
+              "id": "inception3b_pool_proj_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 64, 28, 28],
+              "outputShape": ["B", 64, 28, 28]
+            }
+          ],
+          "outputShape": ["B", 64, 28, 28]
+        }
+      ],
+      "outputShape": [
+        ["B", 128, 28, 28],
+        ["B", 192, 28, 28],
+        ["B", 96, 28, 28],
+        ["B", 64, 28, 28]
+      ]
     },
     {
       "id": "concat3b",
       "name": "concat3b",
       "type": "concat",
       "description": "第二个 Inception 模块，继续提取多尺度特征",
-      "outputShape": [28, 28, 480]
+      "outputShape": ["B", 480, 28, 28]
     },
     {
       "id": "pool3",
@@ -250,92 +433,176 @@
       "description": "降低特征图尺寸",
       "poolSize": [3, 3],
       "stride": [2, 2],
-      "outputShape": [14, 14, 480]
+      "outputShape": ["B", 480, 14, 14]
     },
     {
-      "id": "inception4a_1x1",
-      "name": "分支 1",
-      "type": "conv2d",
-      "description": "192×1×1\n1 层",
-      "filters": 192,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [14, 14, 192]
-    },
-    {
-      "id": "inception4a_3x3_reduce",
-      "name": "分支 2",
-      "type": "conv2d",
-      "description": "96×1×1 → 208×3×3\n2 层",
-      "filters": 96,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [14, 14, 96]
-    },
-    {
-      "id": "inception4a_3x3",
-      "name": "分支 2",
-      "type": "conv2d",
-      "filters": 208,
-      "kernelSize": [3, 3],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [14, 14, 208]
-    },
-    {
-      "id": "inception4a_5x5_reduce",
-      "name": "分支 3",
-      "type": "conv2d",
-      "description": "16×1×1 → 48×5×5\n2 层",
-      "filters": 16,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [14, 14, 16]
-    },
-    {
-      "id": "inception4a_5x5",
-      "name": "分支 3",
-      "type": "conv2d",
-      "filters": 48,
-      "kernelSize": [5, 5],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [14, 14, 48]
-    },
-    {
-      "id": "inception4a_pool",
-      "name": "分支 4",
-      "type": "maxpool2d",
-      "description": "Pool 3×3 → 64×1×1\n2 层",
-      "poolSize": [3, 3],
-      "stride": [1, 1],
-      "outputShape": [14, 14, 480]
-    },
-    {
-      "id": "inception4a_pool_proj",
-      "name": "分支 4",
-      "type": "conv2d",
-      "filters": 64,
-      "kernelSize": [1, 1],
-      "stride": [1, 1],
-      "padding": [1, 1],
-      "activation": "relu",
-      "outputShape": [14, 14, 64]
+      "id": "inception4a_parallel",
+      "name": "Inception INCEPTION4A Parallel",
+      "type": "parallel",
+      "description": "Inception 模块 inception4a 的并行分支",
+      "branches": [
+        {
+          "id": "inception4a_branch1_branch",
+          "name": "1×1 分支",
+          "steps": [
+            {
+              "id": "inception4a_1x1",
+              "name": "分支 1",
+              "type": "conv2d",
+              "description": "192×1×1\n1 层",
+              "filters": 192,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 192, 14, 14]
+            },
+            {
+              "id": "inception4a_1x1_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 192, 14, 14],
+              "outputShape": ["B", 192, 14, 14]
+            }
+          ],
+          "outputShape": ["B", 192, 14, 14]
+        },
+        {
+          "id": "inception4a_branch2_branch",
+          "name": "3×3 分支",
+          "steps": [
+            {
+              "id": "inception4a_3x3_reduce",
+              "name": "分支 2",
+              "type": "conv2d",
+              "description": "96×1×1 → 208×3×3\n2 层",
+              "filters": 96,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 96, 14, 14]
+            },
+            {
+              "id": "inception4a_3x3_reduce_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 96, 14, 14],
+              "outputShape": ["B", 96, 14, 14]
+            },
+            {
+              "id": "inception4a_3x3",
+              "name": "分支 2",
+              "type": "conv2d",
+              "filters": 208,
+              "kernelSize": [3, 3],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 208, 14, 14]
+            },
+            {
+              "id": "inception4a_3x3_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 208, 14, 14],
+              "outputShape": ["B", 208, 14, 14]
+            }
+          ],
+          "outputShape": ["B", 208, 14, 14]
+        },
+        {
+          "id": "inception4a_branch3_branch",
+          "name": "5×5 分支",
+          "steps": [
+            {
+              "id": "inception4a_5x5_reduce",
+              "name": "分支 3",
+              "type": "conv2d",
+              "description": "16×1×1 → 48×5×5\n2 层",
+              "filters": 16,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 16, 14, 14]
+            },
+            {
+              "id": "inception4a_5x5_reduce_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 16, 14, 14],
+              "outputShape": ["B", 16, 14, 14]
+            },
+            {
+              "id": "inception4a_5x5",
+              "name": "分支 3",
+              "type": "conv2d",
+              "filters": 48,
+              "kernelSize": [5, 5],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 48, 14, 14]
+            },
+            {
+              "id": "inception4a_5x5_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 48, 14, 14],
+              "outputShape": ["B", 48, 14, 14]
+            }
+          ],
+          "outputShape": ["B", 48, 14, 14]
+        },
+        {
+          "id": "inception4a_pool_branch",
+          "name": "池化分支",
+          "steps": [
+            {
+              "id": "inception4a_pool",
+              "name": "分支 4",
+              "type": "maxpool2d",
+              "description": "Pool 3×3 → 64×1×1\n2 层",
+              "poolSize": [3, 3],
+              "stride": [1, 1],
+              "outputShape": ["B", 480, 14, 14]
+            },
+            {
+              "id": "inception4a_pool_proj",
+              "name": "分支 4",
+              "type": "conv2d",
+              "filters": 64,
+              "kernelSize": [1, 1],
+              "stride": [1, 1],
+              "padding": [1, 1],
+              "outputShape": ["B", 64, 14, 14]
+            },
+            {
+              "id": "inception4a_pool_proj_act",
+              "name": "ReLU 激活",
+              "type": "relu",
+              "activation": "relu",
+              "inputShape": ["B", 64, 14, 14],
+              "outputShape": ["B", 64, 14, 14]
+            }
+          ],
+          "outputShape": ["B", 64, 14, 14]
+        }
+      ],
+      "outputShape": [
+        ["B", 192, 14, 14],
+        ["B", 208, 14, 14],
+        ["B", 48, 14, 14],
+        ["B", 64, 14, 14]
+      ]
     },
     {
       "id": "concat4a",
       "name": "concat4a",
       "type": "concat",
       "description": "更深层的 Inception 模块",
-      "outputShape": [14, 14, 512]
+      "outputShape": ["B", 512, 14, 14]
     },
     {
       "id": "pool4",
@@ -344,14 +611,14 @@
       "description": "全局平均池化",
       "poolSize": [7, 7],
       "stride": [1, 1],
-      "outputShape": [1, 1, 512]
+      "outputShape": ["B", 512, 1, 1]
     },
     {
       "id": "flatten",
       "name": "Flatten",
       "type": "flatten",
       "description": "展平为一维向量",
-      "outputShape": [512]
+      "outputShape": ["B", 512]
     },
     {
       "id": "dropout",
@@ -359,289 +626,129 @@
       "type": "dropout",
       "description": "防止过拟合",
       "rate": 0.4,
-      "outputShape": [512]
+      "outputShape": ["B", 512]
     },
     {
       "id": "fc",
       "name": "全连接层",
-      "type": "dense",
+      "type": "linear",
       "description": "分类前的全连接层",
       "units": 1000,
+      "outputShape": ["B", 1000]
+    },
+    {
+      "id": "fc_act",
+      "name": "ReLU 激活",
+      "type": "relu",
       "activation": "relu",
-      "outputShape": [1000]
+      "inputShape": ["B", 1000],
+      "outputShape": ["B", 1000]
     },
     {
       "id": "output",
       "name": "输出层",
-      "type": "output",
+      "type": "linear",
       "description": "1000 类别输出",
+      "outputShape": ["B", 1000]
+    },
+    {
+      "id": "output_act",
+      "name": "Softmax 激活",
+      "type": "softmax",
       "activation": "softmax",
-      "outputShape": [1000]
+      "inputShape": ["B", 1000],
+      "outputShape": ["B", 1000]
     }
   ],
   "edges": [
     {
-      "id": "e1",
+      "id": "edge_1_input_to_stem_network_normal",
       "source": "input",
       "target": "stem_network",
       "type": "normal"
     },
     {
-      "id": "e2",
+      "id": "edge_2_stem_network_to_inception3a_parallel_normal",
       "source": "stem_network",
-      "target": "inception3a_1x1",
+      "target": "inception3a_parallel",
       "type": "normal"
     },
     {
-      "id": "e3",
-      "source": "stem_network",
-      "target": "inception3a_3x3_reduce",
-      "type": "normal"
-    },
-    {
-      "id": "e4",
-      "source": "stem_network",
-      "target": "inception3a_5x5_reduce",
-      "type": "normal"
-    },
-    {
-      "id": "e5",
-      "source": "stem_network",
-      "target": "inception3a_pool",
-      "type": "normal"   
-    },
-    {
-      "id": "e6_1",
-      "source": "pool2",
-      "target": "inception3a_1x1",
-      "type": "normal"
-    },
-    {
-      "id": "e6_2",
-      "source": "pool2",
-      "target": "inception3a_3x3_reduce",
-      "type": "normal"
-    },
-    {
-      "id": "e6_3",
-      "source": "pool2",
-      "target": "inception3a_5x5_reduce",
-      "type": "normal"
-    },
-    {
-      "id": "e6_4",
-      "source": "pool2",
-      "target": "inception3a_pool",
-      "type": "normal"
-    },
-    {
-      "id": "e7_1",
-      "source": "inception3a_3x3_reduce",
-      "target": "inception3a_3x3",
-      "type": "normal"
-    },
-    {
-      "id": "e7_2",
-      "source": "inception3a_5x5_reduce",
-      "target": "inception3a_5x5",
-      "type": "normal"
-    },
-    {
-      "id": "e7_3",
-      "source": "inception3a_pool",
-      "target": "inception3a_pool_proj",
-      "type": "normal"
-    },
-    {
-      "id": "e8_1",
-      "source": "inception3a_1x1",
+      "id": "edge_3_inception3a_parallel_to_concat3a_normal",
+      "source": "inception3a_parallel",
       "target": "concat3a",
       "type": "normal"
     },
     {
-      "id": "e8_2",
-      "source": "inception3a_3x3",
-      "target": "concat3a",
-      "type": "normal"
-    },
-    {
-      "id": "e8_3",
-      "source": "inception3a_5x5",
-      "target": "concat3a",
-      "type": "normal"
-    },
-    {
-      "id": "e8_4",
-      "source": "inception3a_pool_proj",
-      "target": "concat3a",
-      "type": "normal"
-    },
-    {
-      "id": "e9_1",
+      "id": "edge_4_concat3a_to_inception3b_parallel_normal",
       "source": "concat3a",
-      "target": "inception3b_1x1",
+      "target": "inception3b_parallel",
       "type": "normal"
     },
     {
-      "id": "e9_2",
-      "source": "concat3a",
-      "target": "inception3b_3x3_reduce",
-      "type": "normal"
-    },
-    {
-      "id": "e9_3",
-      "source": "concat3a",
-      "target": "inception3b_5x5_reduce",
-      "type": "normal"
-    },
-    {
-      "id": "e9_4",
-      "source": "concat3a",
-      "target": "inception3b_pool",
-      "type": "normal"
-    },
-    {
-      "id": "e10_1",
-      "source": "inception3b_3x3_reduce",
-      "target": "inception3b_3x3",
-      "type": "normal"
-    },
-    {
-      "id": "e10_2",
-      "source": "inception3b_5x5_reduce",
-      "target": "inception3b_5x5",
-      "type": "normal"
-    },
-    {
-      "id": "e10_3",
-      "source": "inception3b_pool",
-      "target": "inception3b_pool_proj",
-      "type": "normal"
-    },
-    {
-      "id": "e11_1",
-      "source": "inception3b_1x1",
+      "id": "edge_5_inception3b_parallel_to_concat3b_normal",
+      "source": "inception3b_parallel",
       "target": "concat3b",
       "type": "normal"
     },
     {
-      "id": "e11_2",
-      "source": "inception3b_3x3",
-      "target": "concat3b",
-      "type": "normal"
-    },
-    {
-      "id": "e11_3",
-      "source": "inception3b_5x5",
-      "target": "concat3b",
-      "type": "normal"
-    },
-    {
-      "id": "e11_4",
-      "source": "inception3b_pool_proj",
-      "target": "concat3b",
-      "type": "normal"
-    },
-    {
-      "id": "e12",
+      "id": "edge_6_concat3b_to_pool3_normal",
       "source": "concat3b",
       "target": "pool3",
       "type": "normal"
     },
     {
-      "id": "e13_1",
+      "id": "edge_7_pool3_to_inception4a_parallel_normal",
       "source": "pool3",
-      "target": "inception4a_1x1",
+      "target": "inception4a_parallel",
       "type": "normal"
     },
     {
-      "id": "e13_2",
-      "source": "pool3",
-      "target": "inception4a_3x3_reduce",
-      "type": "normal"
-    },
-    {
-      "id": "e13_3",
-      "source": "pool3",
-      "target": "inception4a_5x5_reduce",
-      "type": "normal"
-    },
-    {
-      "id": "e13_4",
-      "source": "pool3",
-      "target": "inception4a_pool",
-      "type": "normal"
-    },
-    {
-      "id": "e14_1",
-      "source": "inception4a_3x3_reduce",
-      "target": "inception4a_3x3",
-      "type": "normal"
-    },
-    {
-      "id": "e14_2",
-      "source": "inception4a_5x5_reduce",
-      "target": "inception4a_5x5",
-      "type": "normal"
-    },
-    {
-      "id": "e14_3",
-      "source": "inception4a_pool",
-      "target": "inception4a_pool_proj",
-      "type": "normal"
-    },
-    {
-      "id": "e15_1",
-      "source": "inception4a_1x1",
+      "id": "edge_8_inception4a_parallel_to_concat4a_normal",
+      "source": "inception4a_parallel",
       "target": "concat4a",
       "type": "normal"
     },
     {
-      "id": "e15_2",
-      "source": "inception4a_3x3",
-      "target": "concat4a",
-      "type": "normal"
-    },
-    {
-      "id": "e15_3",
-      "source": "inception4a_5x5",
-      "target": "concat4a",
-      "type": "normal"
-    },
-    {
-      "id": "e15_4",
-      "source": "inception4a_pool_proj",
-      "target": "concat4a",
-      "type": "normal"
-    },
-    {
-      "id": "e16",
+      "id": "edge_9_concat4a_to_pool4_normal",
       "source": "concat4a",
       "target": "pool4",
       "type": "normal"
     },
     {
-      "id": "e17",
+      "id": "edge_10_pool4_to_flatten_normal",
       "source": "pool4",
       "target": "flatten",
       "type": "normal"
     },
     {
-      "id": "e18",
+      "id": "edge_11_flatten_to_dropout_normal",
       "source": "flatten",
       "target": "dropout",
       "type": "normal"
     },
     {
-      "id": "e19",
+      "id": "edge_12_dropout_to_fc_normal",
       "source": "dropout",
       "target": "fc",
       "type": "normal"
     },
     {
-      "id": "e20",
+      "id": "edge_13_fc_to_fc_act_normal",
       "source": "fc",
+      "target": "fc_act",
+      "type": "normal"
+    },
+    {
+      "id": "edge_14_fc_act_to_output_normal",
+      "source": "fc_act",
       "target": "output",
+      "type": "normal"
+    },
+    {
+      "id": "edge_15_output_to_output_act_normal",
+      "source": "output",
+      "target": "output_act",
       "type": "normal"
     }
   ]

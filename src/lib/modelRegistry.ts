@@ -14,97 +14,83 @@ import type { Model } from "@/lib/types"
 import leNetData from "@/models/lenet.json"
 import alexNetData from "@/models/alexnet.json"
 import vgg11Data from "@/models/vgg11.json"
-import vgg13Data from "@/models/vgg13.json"
-import vgg16Data from "@/models/vgg16.json"
-import vgg19Data from "@/models/vgg19.json"
 import googleNetData from "@/models/googlenet.json"
 import resNet18Data from "@/models/resnet18.json"
-import resNet34Data from "@/models/resnet34.json"
-import resNet50Data from "@/models/resnet50.json"
-import resNet101Data from "@/models/resnet101.json"
-import resNet152Data from "@/models/resnet152.json"
+
 
 /**
  * 所有注册的模型
  * 添加新模型时,只需在此数组中添加即可
  */
-export const models: Model[] = [
+export const registeredModels: readonly Model[] = [
   leNetData as Model,
   alexNetData as Model,
   vgg11Data as Model,
-  vgg13Data as Model,
-  vgg16Data as Model,
-  vgg19Data as Model,
   googleNetData as Model,
   resNet18Data as Model,
-  resNet34Data as Model,
-  resNet50Data as Model,
-  resNet101Data as Model,
-  resNet152Data as Model,
-]
+] as const
 
 /**
  * 模型名称到模型数据的映射
- * 自动根据 metadata.name 字段建立索引,无需手动维护
+ * 自动根据 metadata.name 字段建立索引
  */
-export const modelRegistry: Record<string, Model> = Object.fromEntries(
-  models.map((model) => [model.metadata.name, model])
+const modelIndex: Record<string, Model> = Object.fromEntries(
+  registeredModels.map((model) => [model.metadata.name, model])
 )
 
-/**
- * 根据名称获取模型
- */
 export function getModelByName(name: string): Model | undefined {
-  return modelRegistry[name]
+  return modelIndex[name]
 }
 
-/**
- * 获取所有模型分类
- */
-export function getAllCategories(): string[] {
+export function listModels(): Model[] {
+  return [...registeredModels]
+}
+
+export function listCategories(): string[] {
   const categories = new Set<string>()
-  models.forEach((model) => {
-    if (model.metadata.category) {
-      categories.add(model.metadata.category)
-    }
+  registeredModels.forEach((model) => {
+    model.metadata.category?.forEach((category) => categories.add(category))
   })
   return ["全部", ...Array.from(categories).sort()]
 }
 
-/**
- * 获取所有标签
- */
-export function getAllTags(): string[] {
+export function listTags(): string[] {
   const tags = new Set<string>()
-  models.forEach((model) => {
+  registeredModels.forEach((model) => {
     model.metadata.tags?.forEach((tag) => tags.add(tag))
   })
   return Array.from(tags).sort()
 }
 
-/**
- * 搜索模型
- */
-export function searchModels(
-  query: string,
-  category?: string,
+export interface ModelSearchFilters {
+  query?: string
+  category?: string
   tags?: string[]
-): Model[] {
-  return models.filter((model) => {
-    // 搜索过滤
-    const matchesSearch =
-      query === "" ||
-      model.metadata.displayName.toLowerCase().includes(query.toLowerCase()) ||
-      model.metadata.description.toLowerCase().includes(query.toLowerCase()) ||
-      model.metadata.name.toLowerCase().includes(query.toLowerCase())
+}
 
-    // 分类过滤
+export function searchModels(filters: ModelSearchFilters = {}): Model[] {
+  const { query = "", category, tags } = filters
+  const normalizedQuery = query.trim().toLowerCase()
+
+  return registeredModels.filter((model) => {
+    const searchableContent = [
+      model.metadata.displayName,
+      model.metadata.description,
+      model.metadata.name,
+      ...(model.metadata.tags ?? []),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+
+    const matchesSearch =
+      normalizedQuery.length === 0 || searchableContent.includes(normalizedQuery)
+
     const matchesCategory =
       !category ||
       category === "全部" ||
-      model.metadata.category === category
+      model.metadata.category?.includes(category)
 
-    // 标签过滤
     const matchesTags =
       !tags ||
       tags.length === 0 ||

@@ -5,13 +5,13 @@ import Link from "next/link"
 import { Search, Filter, Calendar, Users, ArrowRight, Sparkles, Quote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Model } from "@/lib/types"
-import { models, getAllCategories, getAllTags } from "@/lib/modelRegistry"
+import { listCategories, listTags, searchModels } from "@/lib/modelRegistry"
 
 // 所有可用的分类
-const categories = getAllCategories()
+const categories = listCategories()
 
 // 所有可用的标签
-const allTags = getAllTags()
+const allTags = listTags()
 
 export default function GalleryPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -20,34 +20,18 @@ export default function GalleryPage() {
 
   // 过滤模型
   const filteredModels = useMemo(() => {
-    return models
-      .filter((model) => {
-        // 搜索过滤
-        const matchesSearch =
-          searchQuery === "" ||
-          model.metadata.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          model.metadata.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          model.metadata.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const results = searchModels({
+      query: searchQuery,
+      category: selectedCategory,
+      tags: selectedTags,
+    })
 
-        // 分类过滤
-        const matchesCategory =
-          selectedCategory === "全部" ||
-          model.metadata.category === selectedCategory
-
-        // 标签过滤
-        const matchesTags =
-          selectedTags.length === 0 ||
-          selectedTags.every((tag) => model.metadata.tags?.includes(tag))
-
-        return matchesSearch && matchesCategory && matchesTags
+    return results.sort((a, b) =>
+      a.metadata.name.localeCompare(b.metadata.name, undefined, {
+        numeric: true,
+        sensitivity: "base",
       })
-      .sort((a, b) => {
-        // 自然排序：正确处理字符串中的数字（如 resnet18 < resnet34 < resnet101）
-        return a.metadata.name.localeCompare(b.metadata.name, undefined, {
-          numeric: true,
-          sensitivity: 'base'
-        })
-      })
+    )
   }, [searchQuery, selectedCategory, selectedTags])
 
   // 切换标签选择
@@ -241,6 +225,7 @@ interface ModelCardProps {
 
 function ModelCard({ model }: ModelCardProps) {
   const { metadata } = model
+  const isVerified = metadata.verified !== false
 
   return (
     <Link
@@ -254,11 +239,25 @@ function ModelCard({ model }: ModelCardProps) {
             <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">
               {metadata.displayName}
             </h3>
-            {metadata.category && (
-              <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-primary/10 text-primary">
-                {metadata.category}
+            <div className="flex items-center gap-2 flex-wrap">
+              {metadata.category?.map((category) => (
+                <span
+                  key={category}
+                  className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-primary/10 text-primary"
+                >
+                  {category}
+                </span>
+              ))}
+              <span
+                className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${
+                  isVerified
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {isVerified ? "已验证" : "未验证"}
               </span>
-            )}
+            </div>
           </div>
           <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
         </div>
