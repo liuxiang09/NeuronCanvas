@@ -73,6 +73,9 @@ function SandboxCanvasInner({ className = "" }: SandboxCanvasProps) {
   const zoomLevel = useAppStore((state) => state.zoomLevel)
   const canvasActionsRef = useAppStore((state) => state.canvasActionsRef)
   const isSidebarOpen = useAppStore((state) => state.isSidebarOpen)
+  
+  // 右侧属性面板宽度（用于计算浮动面板位置）
+  const rightSidebarWidth = useSandboxStore((state) => state.rightSidebarWidth)
 
   // 自动布局标志（用于区分是否需要自动布局）
   const autoLayoutRef = useRef(false)
@@ -429,15 +432,6 @@ function SandboxCanvasInner({ className = "" }: SandboxCanvasProps) {
     return Math.max(0.04, Math.min(0.25, scale))
   }, [zoomLevel])
 
-  const floatingPanelRight = useMemo(() => {
-    if (!isSidebarOpen) {
-      return "16px"
-    }
-    const SIDEBAR_WIDTH = "26rem"
-    const GAP_PX = 24
-    return `calc(${SIDEBAR_WIDTH} + ${GAP_PX}px)`
-  }, [isSidebarOpen])
-
   return (
     <div
       className={`relative w-full h-full ${className}`}
@@ -465,6 +459,7 @@ function SandboxCanvasInner({ className = "" }: SandboxCanvasProps) {
         nodesConnectable={true}
         elementsSelectable={true}
         selectNodesOnDrag={false}
+        deleteKeyCode={null}
         fitView
         fitViewOptions={{
           padding: 0.2,
@@ -528,10 +523,6 @@ function SandboxCanvasInner({ className = "" }: SandboxCanvasProps) {
         <Panel
           position="top-right"
           className="flex flex-col gap-2"
-          style={{
-            right: floatingPanelRight,
-            transition: "right 0.3s ease-in-out",
-          }}
         >
           <Button
             size="icon"

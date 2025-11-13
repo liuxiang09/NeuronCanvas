@@ -127,7 +127,7 @@ export function NodeToolbar({ className = "" }: NodeToolbarProps) {
 
   return (
     <div
-      className={`w-64 h-full bg-background border-r border-border overflow-y-auto scrollbar-thin ${className}`}
+      className={`h-full bg-background border-r border-border overflow-y-auto scrollbar-thin ${className}`}
     >
       <div className="p-4">
         <h2 className="text-lg font-semibold mb-4">节点类型</h2>
@@ -170,7 +170,7 @@ export function NodeToolbar({ className = "" }: NodeToolbarProps) {
                           onDragEnd={handleDragEnd}
                           onClick={() => handleAddNode(type)}
                           className={`
-                            flex items-center gap-2 px-3 py-2 rounded-md
+                            flex items-center justify-center gap-2 px-3 py-2 rounded-md
                             cursor-pointer transition-all
                             border
                             ${isDragging ? "opacity-50" : ""}

@@ -21,6 +21,7 @@ import { Toolbar } from "@/components/sandbox/Toolbar"
 import { ImportExportDialog } from "@/components/sandbox/ImportExportDialog"
 import { ConfirmDialog } from "@/components/sandbox/ConfirmDialog"
 import { ContextMenu } from "@/components/sandbox/ContextMenu"
+import { Resizer } from "@/components/sandbox/Resizer"
 import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
 import { useSandboxShortcuts } from "@/lib/hooks/useSandboxShortcuts"
 
@@ -31,6 +32,12 @@ import { useSandboxShortcuts } from "@/lib/hooks/useSandboxShortcuts"
 export default function SandboxPage() {
   // 加载本地存储的数据
   const loadFromStorage = useSandboxStore((state) => state.loadFromStorage)
+
+  // 侧边栏宽度状态
+  const leftSidebarWidth = useSandboxStore((state) => state.leftSidebarWidth)
+  const rightSidebarWidth = useSandboxStore((state) => state.rightSidebarWidth)
+  const setLeftSidebarWidth = useSandboxStore((state) => state.setLeftSidebarWidth)
+  const setRightSidebarWidth = useSandboxStore((state) => state.setRightSidebarWidth)
 
   // 初始化时加载本地存储
   useEffect(() => {
@@ -55,6 +62,22 @@ export default function SandboxPage() {
     return () => clearTimeout(timer)
   }, [needsSave, saveToStorage])
 
+  // 处理左侧侧边栏宽度调整
+  const handleLeftResize = useCallback(
+    (deltaX: number) => {
+      setLeftSidebarWidth(leftSidebarWidth + deltaX)
+    },
+    [leftSidebarWidth, setLeftSidebarWidth]
+  )
+
+  // 处理右侧侧边栏宽度调整
+  const handleRightResize = useCallback(
+    (deltaX: number) => {
+      setRightSidebarWidth(rightSidebarWidth + deltaX)
+    },
+    [rightSidebarWidth, setRightSidebarWidth]
+  )
+
   // 自动布局处理函数
   const handleAutoLayout = useCallback(() => {
     // 自动布局会在SandboxCanvas中通过calculateLayout自动处理
@@ -62,22 +85,32 @@ export default function SandboxPage() {
   }, [])
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-[calc(100vh-4rem-3.5rem)]">
       {/* 顶部工具栏 */}
       <Toolbar />
 
       {/* 主内容区域 */}
       <div className="flex-1 flex overflow-hidden">
         {/* 左侧节点工具栏 */}
-        <NodeToolbar />
+        <div style={{ width: `${leftSidebarWidth}px`, minWidth: `${leftSidebarWidth}px`, maxWidth: `${leftSidebarWidth}px` }}>
+          <NodeToolbar />
+        </div>
+
+        {/* 左侧分隔条 */}
+        <Resizer onResize={handleLeftResize} direction="left" />
 
         {/* 中间画布区域 */}
         <div className="flex-1 relative">
           <SandboxCanvas />
         </div>
 
+        {/* 右侧分隔条 */}
+        <Resizer onResize={handleRightResize} direction="right" />
+
         {/* 右侧属性面板 */}
-        <PropertyPanel />
+        <div style={{ width: `${rightSidebarWidth}px`, minWidth: `${rightSidebarWidth}px`, maxWidth: `${rightSidebarWidth}px` }}>
+          <PropertyPanel />
+        </div>
       </div>
 
       {/* 对话框组件 */}

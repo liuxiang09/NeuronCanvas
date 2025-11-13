@@ -63,8 +63,8 @@ export function createInputLayer(
     id: generateNodeId("input"),
     name: getDefaultName("input"),
     type: "input",
-    description: "输入层",
-    outputShape: [64, 1, 32, 32], // 输入层输出形状
+    description: "",
+    outputShape: [0, 0, 0, 0], // 输入层输出形状
   }
 }
 
@@ -78,12 +78,12 @@ export function createConv2DLayer(
     id: generateNodeId("conv2d"),
     name: getDefaultName("conv2d"),
     type: "conv2d",
-    description: "2D卷积层",
-    filters: 32,
-    kernelSize: [3, 3],
-    stride: [1, 1],
-    padding: [1, 1],
-    outputShape: [64, 32, 32, 32],
+    description: "",
+    filters: 0,
+    kernelSize: [0, 0],
+    stride: [0, 0],
+    padding: [0, 0],
+    outputShape: [0, 0, 0, 0],
   }
 }
 
@@ -97,11 +97,11 @@ export function createMaxPool2DLayer(
     id: generateNodeId("maxpool2d"),
     name: getDefaultName("maxpool2d"),
     type: "maxpool2d",
-    description: "最大池化层",
-    poolSize: [2, 2],
-    stride: [2, 2],
+    description: "",
+    poolSize: [0, 0],
+    stride: [0, 0],
     padding: [0, 0],
-    outputShape: [64, 32, 16, 16], // 根据poolSize和stride计算
+    outputShape: [0, 0, 0, 0], // 根据poolSize和stride计算
   }
 }
 
@@ -115,11 +115,11 @@ export function createAvgPool2DLayer(
     id: generateNodeId("avgpool2d"),
     name: getDefaultName("avgpool2d"),
     type: "avgpool2d",
-    description: "平均池化层",
-    poolSize: [2, 2],
-    stride: [2, 2],
+    description: "",
+    poolSize: [0, 0],
+    stride: [0, 0],
     padding: [0, 0],
-    outputShape: [64, 32, 16, 16],
+    outputShape: [0, 0, 0, 0],
   }
 }
 
@@ -133,8 +133,8 @@ export function createAdaptiveAvgPool2DLayer(
     id: generateNodeId("adaptiveavgpool2d"),
     name: getDefaultName("adaptiveavgpool2d"),
     type: "adaptiveavgpool2d",
-    description: "自适应平均池化层",
-    outputShape: [64, 32, 1, 1], // 自适应池化通常输出1x1
+    description: "",
+    outputShape: [0, 0, 0, 0], // 自适应池化通常输出1x1
   }
 }
 
@@ -148,8 +148,8 @@ export function createFlattenLayer(
     id: generateNodeId("flatten"),
     name: getDefaultName("flatten"),
     type: "flatten",
-    description: "展平层",
-    outputShape: [64, 8192], // 展平后的形状
+    description: "",
+    outputShape: [0, 0], // 展平后的形状
   }
 }
 
@@ -163,8 +163,8 @@ export function createLinearLayer(
     id: generateNodeId("linear"),
     name: getDefaultName("linear"),
     type: "linear",
-    description: "全连接层",
-    outputShape: [64, 64], // 默认输出
+    description: "",
+    outputShape: [0, 0], // 默认输出
   }
 }
 
@@ -178,9 +178,9 @@ export function createEmbeddingLayer(
     id: generateNodeId("embedding"),
     name: getDefaultName("embedding"),
     type: "embedding",
-    description: "嵌入层",
-    dimension: 128,
-    outputShape: [64, 100, 128], // 批次大小64，序列长度100，嵌入维度128
+    description: "",
+    dimension: 0,
+    outputShape: [0, 0, 0], // 批次大小64，序列长度100，嵌入维度128
   }
 }
 
@@ -194,9 +194,9 @@ export function createDropoutLayer(
     id: generateNodeId("dropout"),
     name: getDefaultName("dropout"),
     type: "dropout",
-    description: "Dropout层",
-    rate: 0.5,
-    outputShape: [64, 128], // Dropout不改变形状
+    description: "",
+    rate: 0,
+    outputShape: [0, 0], // Dropout不改变形状
   }
 }
 
@@ -210,8 +210,8 @@ export function createBatchNormLayer(
     id: generateNodeId("batchnorm"),
     name: getDefaultName("batchnorm"),
     type: "batchnorm",
-    description: "批归一化层",
-    outputShape: [64, 32, 32, 32], // 批归一化不改变形状
+    description: "",
+    outputShape: [0, 0, 0, 0], // 批归一化不改变形状
   }
 }
 
@@ -225,8 +225,8 @@ export function createLayerNormLayer(
     id: generateNodeId("layernorm"),
     name: getDefaultName("layernorm"),
     type: "layernorm",
-    description: "层归一化层",
-    outputShape: [64, 128], // 层归一化不改变形状
+    description: "",
+    outputShape: [0, 0], // 层归一化不改变形状
   }
 }
 
@@ -240,8 +240,8 @@ export function createLRNLayer(
     id: generateNodeId("lrn"),
     name: getDefaultName("lrn"),
     type: "lrn",
-    description: "局部响应归一化层",
-    outputShape: [64, 32, 32, 32], // LRN不改变形状
+    description: "",
+    outputShape: [0, 0, 0, 0], // LRN不改变形状
   }
 }
 
@@ -255,8 +255,8 @@ export function createReLULayer(
     id: generateNodeId("relu"),
     name: getDefaultName("relu"),
     type: "relu",
-    description: "ReLU激活函数",
-    outputShape: [64, 32, 32, 32], // 激活函数不改变形状
+    description: "",
+    outputShape: [0, 0, 0, 0], // 激活函数不改变形状
   }
 }
 
@@ -270,8 +270,8 @@ export function createSigmoidLayer(
     id: generateNodeId("sigmoid"),
     name: getDefaultName("sigmoid"),
     type: "sigmoid",
-    description: "Sigmoid激活函数",
-    outputShape: [64, 128], // 激活函数不改变形状
+    description: "",
+    outputShape: [0, 0], // 激活函数不改变形状
   }
 }
 
@@ -285,8 +285,8 @@ export function createTanhLayer(
     id: generateNodeId("tanh"),
     name: getDefaultName("tanh"),
     type: "tanh",
-    description: "Tanh激活函数",
-    outputShape: [64, 32, 32, 32], // 激活函数不改变形状
+    description: "",
+    outputShape: [0, 0, 0, 0], // 激活函数不改变形状
   }
 }
 
@@ -300,8 +300,8 @@ export function createSoftmaxLayer(
     id: generateNodeId("softmax"),
     name: getDefaultName("softmax"),
     type: "softmax",
-    description: "Softmax激活函数",
-    outputShape: [64, 10], // 激活函数不改变形状
+    description: "",
+    outputShape: [0, 0], // 激活函数不改变形状
   }
 }
 
@@ -315,8 +315,8 @@ export function createAddLayer(
     id: generateNodeId("add"),
     name: getDefaultName("add"),
     type: "add",
-    description: "加法层（用于残差连接）",
-    outputShape: [64, 32, 32, 32], // 加法不改变形状（要求输入形状相同）
+    description: "",
+    outputShape: [0, 0, 0, 0], // 加法不改变形状（要求输入形状相同）
   }
 }
 
@@ -330,8 +330,8 @@ export function createConcatLayer(
     id: generateNodeId("concat"),
     name: getDefaultName("concat"),
     type: "concat",
-    description: "拼接层",
-    outputShape: [64, 64, 32, 32], // 拼接后通道数翻倍
+    description: "",
+    outputShape: [0, 0, 0, 0], // 拼接后通道数翻倍
   }
 }
 
@@ -345,9 +345,9 @@ export function createSequentialLayer(
     id: generateNodeId("sequential"),
     name: getDefaultName("sequential"),
     type: "sequential",
-    description: "顺序模块",
+    description: "",
     steps: [],
-    outputShape: [64, 32, 32], // 默认输出（会根据子节点计算）
+    outputShape: [0, 0, 0], // 默认输出（会根据子节点计算）
   }
 }
 
@@ -361,9 +361,9 @@ export function createParallelLayer(
     id: generateNodeId("parallel"),
     name: getDefaultName("parallel"),
     type: "parallel",
-    description: "并行模块",
+    description: "",
     branches: [],
-    outputShape: [64, 32, 32], // 默认输出（会根据子节点计算）
+    outputShape: [0, 0, 0], // 默认输出（会根据子节点计算）
   }
 }
 
@@ -377,11 +377,11 @@ export function createSelfAttentionLayer(
     id: generateNodeId("self-attention"),
     name: getDefaultName("self-attention"),
     type: "self-attention",
-    description: "自注意力层",
-    numHeads: 8,
-    headDim: 64,
-    modelDim: 512,
-    outputShape: [64, 100, 512], // 自注意力输出形状与输入相同
+    description: "",
+    numHeads: 0,
+    headDim: 0,
+    modelDim: 0,
+    outputShape: [0, 0, 0], // 自注意力输出形状与输入相同
   } as Layer
 }
 
@@ -395,11 +395,11 @@ export function createCrossAttentionLayer(
     id: generateNodeId("cross-attention"),
     name: getDefaultName("cross-attention"),
     type: "cross-attention",
-    description: "交叉注意力层",
-    numHeads: 8,
-    headDim: 64,
-    modelDim: 512,
-    outputShape: [64, 100, 512], // 交叉注意力输出形状与输入相同
+    description: "",
+    numHeads: 0,
+    headDim: 0,
+    modelDim: 0,
+    outputShape: [0, 0, 0], // 交叉注意力输出形状与输入相同
   }
 }
 

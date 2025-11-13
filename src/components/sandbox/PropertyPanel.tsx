@@ -119,40 +119,22 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
   )
 
   // 临时存储输入值（用于onChange，不立即更新）
+  // 对于数组字段，使用 "field_index" 作为 key
+  // 对于普通字段，直接使用 field 作为 key
   const [tempValues, setTempValues] = useState<Record<string, string>>({})
   
   const handleFieldInputChange = useCallback(
-    (field: string, value: string, previousValue?: number) => {
-      // 更新临时值
+    (field: string, value: string) => {
+      // 更新临时值，允许空值
       setTempValues(prev => ({ ...prev, [field]: value }))
-      
-      // 检测是否是+1/-1按钮操作（值变化正好是step的大小）
-      if (previousValue !== undefined && value !== "" && value !== null && value !== undefined) {
-        const numValue = Number(value)
-        if (!isNaN(numValue)) {
-          const diff = Math.abs(numValue - previousValue)
-          // 如果差值正好是1，可能是+1/-1按钮操作，立即更新
-          if (diff === 1) {
-            if (field === "rate" || field === "dropout") {
-              handleFieldChange(field, numValue)
-            } else {
-              handleFieldChange(field, value)
-            }
-            // 清除临时值，因为已经更新了
-            setTempValues(prev => {
-              const newValues = { ...prev }
-              delete newValues[field]
-              return newValues
-            })
-          }
-        }
-      }
     },
-    [handleFieldChange]
+    []
   )
 
   const handleFieldBlur = useCallback(
     (field: string) => {
+      if (!selectedNode) return
+      
       const tempValue = tempValues[field]
       // 清除临时值
       setTempValues(prev => {
@@ -161,33 +143,63 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
         return newValues
       })
       
-      // 如果临时值存在，使用临时值更新（与ChildNodeEditor保持一致）
-      if (tempValue !== undefined) {
+      // 如果临时值存在且不为空，使用临时值更新
+      if (tempValue !== undefined && tempValue !== "") {
         handleFieldChange(field, tempValue)
+      } else if (tempValue === "") {
+        // 如果临时值为空字符串，对于数字字段设置为0
+        const numericFields = ["filters", "dimension", "numHeads", "headDim", "modelDim", "rate", "dropout"]
+        if (numericFields.includes(field)) {
+          // 对于rate和dropout，0就是0
+          // 对于其他数字字段，也是0
+          updateLayer(selectedNode.id, { [field]: 0 })
+        }
       }
     },
-    [tempValues, handleFieldChange]
+    [tempValues, handleFieldChange, selectedNode, updateLayer]
   )
 
-  // 更新数组字段（简化版本：直接更新）
-  const handleArrayFieldChange = useCallback(
+  // 数组字段输入变化（只更新临时状态，允许空值）
+  const handleArrayFieldInputChange = useCallback(
     (field: string, index: number, value: string) => {
-      if (!selectedNode) return
-      const currentValue = (selectedNode as any)[field] as number[] | undefined
-      const newArray = [...(currentValue || [])]
-      
-      // 如果值为空字符串，设为0
-      if (value === "" || value === null || value === undefined) {
-        newArray[index] = 0
-      } else {
-        const numValue = Number(value)
-        // 如果是有效数字，更新；否则设为0
-        newArray[index] = isNaN(numValue) ? 0 : numValue
-      }
-      
-      updateLayer(selectedNode.id, { [field]: newArray })
+      const key = `${field}_${index}`
+      setTempValues(prev => ({ ...prev, [key]: value }))
     },
-    [selectedNode, updateLayer]
+    []
+  )
+
+  // 数组字段失去焦点时验证并更新
+  const handleArrayFieldBlur = useCallback(
+    (field: string, index: number) => {
+      if (!selectedNode) return
+      const key = `${field}_${index}`
+      const tempValue = tempValues[key]
+      
+      // 清除临时值
+      setTempValues(prev => {
+        const newValues = { ...prev }
+        delete newValues[key]
+        return newValues
+      })
+      
+      // 如果临时值存在，验证并更新
+      if (tempValue !== undefined) {
+        const currentValue = (selectedNode as any)[field] as number[] | undefined
+        const newArray = [...(currentValue || [])]
+        
+        if (tempValue === "" || tempValue === null || tempValue === undefined) {
+          // 空值设为 0
+          newArray[index] = 0
+        } else {
+          const numValue = Number(tempValue)
+          // 如果是有效数字，更新；否则设为 0
+          newArray[index] = isNaN(numValue) ? 0 : numValue
+        }
+        
+        updateLayer(selectedNode.id, { [field]: newArray })
+      }
+    },
+    [selectedNode, tempValues, updateLayer]
   )
 
   // 添加数组元素
@@ -398,22 +410,25 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
         return (
           <div className="space-y-2">
             {shapeArray.map((item, index) => {
+              const key = `${field}_${index}`
+              const displayValue = tempValues[key] !== undefined ? tempValues[key] : (item ?? 0)
               return (
-              <div key={index} className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground w-8 shrink-0">[{index}]</span>
+              <div key={index} className="flex items-center gap-1.5 min-w-0">
+                <span className="text-xs text-muted-foreground w-6 shrink-0 flex-shrink-0">[{index}]</span>
                 <input
                   type="number"
-                  value={item ?? 0}
-                  onChange={(e) => handleArrayFieldChange(field, index, e.target.value)}
+                  value={displayValue}
+                  onChange={(e) => handleArrayFieldInputChange(field, index, e.target.value)}
+                  onBlur={() => handleArrayFieldBlur(field, index)}
                   step="1"
-                  className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-sm"
+                  className="flex-1 min-w-0 px-2 py-2 border border-border rounded-md bg-background text-sm"
                   placeholder={`维度 ${index}`}
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => handleRemoveArrayElement(field, index)}
-                  className="h-8 w-8 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="h-8 w-8 shrink-0 flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                   title="删除此维度"
                 >
                   <X className="h-4 w-4" />
@@ -446,21 +461,24 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
         return (
           <div className="space-y-2">
             {arrayValue.map((item, index) => {
+              const key = `${field}_${index}`
+              const displayValue = tempValues[key] !== undefined ? tempValues[key] : (item ?? 0)
               return (
-              <div key={index} className="flex items-center gap-2">
+              <div key={index} className="flex items-center gap-1.5 min-w-0">
                 <input
                   type="number"
-                  value={item ?? 0}
-                  onChange={(e) => handleArrayFieldChange(field, index, e.target.value)}
+                  value={displayValue}
+                  onChange={(e) => handleArrayFieldInputChange(field, index, e.target.value)}
+                  onBlur={() => handleArrayFieldBlur(field, index)}
                   step="1"
-                  className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-sm"
+                  className="flex-1 min-w-0 px-2 py-2 border border-border rounded-md bg-background text-sm"
                   placeholder={`元素 ${index + 1}`}
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => handleRemoveArrayElement(field, index)}
-                  className="h-8 w-8 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="h-8 w-8 shrink-0 flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                   title="删除此元素"
                 >
                   <X className="h-4 w-4" />
@@ -507,14 +525,14 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
         // 特殊处理rate和dropout（显示为百分比）
         if (field === "rate" || field === "dropout") {
           const percentValue = fieldValue * 100
-          // 与ChildNodeEditor保持一致：如果tempValues中有值，使用它；否则使用实际值
+          // 如果tempValues中有值，使用它；否则使用实际值
           const displayValue = tempValues[field] !== undefined ? tempValues[field] : percentValue
           return (
             <div className="flex items-center gap-2">
               <input
                 type="number"
                 value={displayValue}
-                onChange={(e) => handleFieldInputChange(field, e.target.value, percentValue)}
+                onChange={(e) => handleFieldInputChange(field, e.target.value)}
                 onBlur={() => handleFieldBlur(field)}
                 min="0"
                 max="100"
@@ -525,13 +543,13 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
             </div>
           )
         }
-        // 与ChildNodeEditor保持一致：如果tempValues中有值，使用它；否则使用实际值
+        // 如果tempValues中有值，使用它；否则使用实际值
         const displayValue = tempValues[field] !== undefined ? tempValues[field] : fieldValue
         return (
           <input
             type="number"
             value={displayValue}
-            onChange={(e) => handleFieldInputChange(field, e.target.value, fieldValue)}
+            onChange={(e) => handleFieldInputChange(field, e.target.value)}
             onBlur={() => handleFieldBlur(field)}
             step="1"
             className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
@@ -593,16 +611,35 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
     },
     [
       selectedNode,
+      tempValues,
       handleFieldChange,
-      handleArrayFieldChange,
+      handleFieldInputChange,
+      handleFieldBlur,
+      handleArrayFieldInputChange,
+      handleArrayFieldBlur,
       handleAddArrayElement,
       handleRemoveArrayElement,
     ]
   )
 
+  // 未选中节点时的待选状态
   if (!selectedNode) {
     return (
-      null
+      <div
+        className={`h-full bg-background border-l border-border flex flex-col items-center justify-center p-8 ${className}`}
+      >
+        <div className="text-center space-y-4 max-w-xs">
+          <div className="w-16 h-16 mx-auto rounded-full bg-muted/50 flex items-center justify-center">
+            <Edit2 className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">未选中节点</h3>
+            <p className="text-sm text-muted-foreground">
+              请在画布上选择一个节点以查看和编辑其属性
+            </p>
+          </div>
+        </div>
+      </div>
     )
   }
 
@@ -611,7 +648,7 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
 
   return (
     <div
-      className={`w-[420px] h-full bg-background border-l border-border flex flex-col ${className}`}
+      className={`h-full bg-background border-l border-border flex flex-col ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
@@ -708,10 +745,10 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
             <div className="space-y-2">
               {editableFields.map((field) => {
                 return (
-                  <div key={field} className="py-2 px-3 rounded-lg bg-muted/50 space-y-1.5">
+                  <div key={field} className="py-2 px-3 rounded-lg bg-muted/50 space-y-1.5 min-w-0">
                     <div className="text-sm text-muted-foreground">{getFieldLabel(field)}</div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
+                    <div className="flex items-center justify-between min-w-0">
+                      <div className="flex-1 min-w-0">
                         {renderFieldEditor(field)}
                       </div>
                     </div>
@@ -796,32 +833,60 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
 
   const handleFieldBlur = useCallback((field: string) => {
     const tempValue = tempValues[field]
-    if (tempValue !== undefined) {
+    // 清除临时值
+    setTempValues(prev => {
+      const newValues = { ...prev }
+      delete newValues[field]
+      return newValues
+    })
+    
+    // 如果临时值存在且不为空，使用临时值更新
+    if (tempValue !== undefined && tempValue !== "") {
       handleFieldChange(field, tempValue)
-      setTempValues(prev => {
-        const newValues = { ...prev }
-        delete newValues[field]
-        return newValues
-      })
+    } else if (tempValue === "") {
+      // 如果临时值为空字符串，对于数字字段设置为0
+      const numericFields = ["filters", "dimension", "numHeads", "headDim", "modelDim", "rate", "dropout"]
+      if (numericFields.includes(field)) {
+        onUpdate({ [field]: 0 })
+      }
     }
-  }, [tempValues, handleFieldChange])
+  }, [tempValues, handleFieldChange, onUpdate])
 
-  // 更新数组字段（简化版本：直接更新）
-  const handleArrayFieldChange = useCallback((field: string, index: number, value: string) => {
-    const currentValue = (layer as any)[field] as number[] | undefined
-    const newArray = [...(currentValue || [])]
+  // 数组字段输入变化（只更新临时状态，允许空值）
+  const handleArrayFieldInputChange = useCallback((field: string, index: number, value: string) => {
+    const key = `${field}_${index}`
+    setTempValues(prev => ({ ...prev, [key]: value }))
+  }, [])
+
+  // 数组字段失去焦点时验证并更新
+  const handleArrayFieldBlur = useCallback((field: string, index: number) => {
+    const key = `${field}_${index}`
+    const tempValue = tempValues[key]
     
-    // 如果值为空字符串，设为0
-    if (value === "" || value === null || value === undefined) {
-      newArray[index] = 0
-    } else {
-      const numValue = Number(value)
-      // 如果是有效数字，更新；否则设为0
-      newArray[index] = isNaN(numValue) ? 0 : numValue
+    // 清除临时值
+    setTempValues(prev => {
+      const newValues = { ...prev }
+      delete newValues[key]
+      return newValues
+    })
+    
+    // 如果临时值存在，验证并更新
+    if (tempValue !== undefined) {
+      const currentValue = (layer as any)[field] as number[] | undefined
+      const newArray = [...(currentValue || [])]
+      
+      if (tempValue === "" || tempValue === null || tempValue === undefined) {
+        // 空值设为 0
+        newArray[index] = 0
+      } else {
+        const numValue = Number(tempValue)
+        // 如果是有效数字，更新；否则设为 0
+        newArray[index] = isNaN(numValue) ? 0 : numValue
+      }
+      
+      onUpdate({ [field]: newArray })
     }
-    
-    onUpdate({ [field]: newArray })
-  }, [layer, onUpdate])
+  }, [layer, tempValues, onUpdate])
 
   const handleAddArrayElement = useCallback((field: string) => {
     const currentValue = (layer as any)[field] as number[] | undefined
@@ -848,21 +913,24 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
       return (
         <div className="space-y-2">
           {shapeArray.map((item, index) => {
+            const key = `${field}_${index}`
+            const displayValue = tempValues[key] !== undefined ? tempValues[key] : (item ?? 0)
             return (
-            <div key={index} className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-6 shrink-0">[{index}]</span>
+            <div key={index} className="flex items-center gap-1.5 min-w-0">
+              <span className="text-xs text-muted-foreground w-5 shrink-0 flex-shrink-0">[{index}]</span>
               <input
                 type="number"
-                value={item ?? 0}
-                onChange={(e) => handleArrayFieldChange(field, index, e.target.value)}
-                className="flex-1 px-2 py-1 text-xs border border-border rounded bg-background"
+                value={displayValue}
+                onChange={(e) => handleArrayFieldInputChange(field, index, e.target.value)}
+                onBlur={() => handleArrayFieldBlur(field, index)}
+                className="flex-1 min-w-0 px-1.5 py-1 text-xs border border-border rounded bg-background"
                 placeholder={`维度 ${index}`}
               />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemoveArrayElement(field, index)}
-                className="h-6 w-6 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="h-6 w-6 shrink-0 flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                 title="删除此维度"
               >
                 <X className="h-3 w-3" />
@@ -888,20 +956,23 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
       return (
         <div className="space-y-2">
           {fieldValue.map((item, index) => {
+            const key = `${field}_${index}`
+            const displayValue = tempValues[key] !== undefined ? tempValues[key] : (item ?? 0)
             return (
-            <div key={index} className="flex items-center gap-2">
+            <div key={index} className="flex items-center gap-1.5 min-w-0">
               <input
                 type="number"
-                value={item ?? 0}
-                onChange={(e) => handleArrayFieldChange(field, index, e.target.value)}
-                className="flex-1 px-2 py-1 text-xs border border-border rounded bg-background"
+                value={displayValue}
+                onChange={(e) => handleArrayFieldInputChange(field, index, e.target.value)}
+                onBlur={() => handleArrayFieldBlur(field, index)}
+                className="flex-1 min-w-0 px-1.5 py-1 text-xs border border-border rounded bg-background"
                 placeholder={`元素 ${index + 1}`}
               />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemoveArrayElement(field, index)}
-                className="h-6 w-6 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="h-6 w-6 shrink-0 flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                 title="删除此元素"
               >
                 <X className="h-3 w-3" />
@@ -1008,7 +1079,7 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
         className="w-full px-2 py-1 text-xs border border-border rounded bg-background"
       />
     )
-  }, [layer, tempValues, handleFieldChange, handleFieldInputChange, handleFieldBlur, handleArrayFieldChange, handleAddArrayElement, handleRemoveArrayElement])
+  }, [layer, tempValues, handleFieldChange, handleFieldInputChange, handleFieldBlur, handleArrayFieldInputChange, handleArrayFieldBlur, handleAddArrayElement, handleRemoveArrayElement])
 
   return (
     <div className="p-3 border-t border-border bg-background space-y-3 max-h-96 overflow-y-auto">
