@@ -143,7 +143,7 @@ function getNodeSize(layer: Layer, layoutConfig: LayoutConfig): { width: number;
         (acc: number, branch: any) => acc + (Array.isArray(branch.steps) ? branch.steps.length : 0),
         0
       )
-      width = Math.max(320, width + branchCount * 50)
+      width = Math.max(320, width + branchCount * 60)
       height = Math.max(240, 180 + branchCount * 60 + totalSteps * 18)
       break
     }

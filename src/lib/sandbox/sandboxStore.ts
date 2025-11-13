@@ -100,6 +100,12 @@ interface SandboxState {
   needsSave: boolean
   setNeedsSave: (needs: boolean) => void
 
+  // 侧边栏宽度（像素值）
+  leftSidebarWidth: number
+  rightSidebarWidth: number
+  setLeftSidebarWidth: (width: number) => void
+  setRightSidebarWidth: (width: number) => void
+
   // 从localStorage加载
   loadFromStorage: () => void
   // 保存到localStorage
@@ -107,39 +113,58 @@ interface SandboxState {
 }
 
 /**
+ * 计算初始侧边栏宽度（基于屏幕宽度百分比）
+ */
+const getInitialSidebarWidths = () => {
+  if (typeof window === "undefined") {
+    return { left: 256, right: 420 } // 默认值（SSR）
+  }
+  const screenWidth = window.innerWidth
+  return {
+    left: Math.max(200, Math.min(screenWidth * 0.15, screenWidth * 0.4)), // 15%，最小200px，最大40%
+    right: Math.max(300, Math.min(screenWidth * 0.2, screenWidth * 0.5)), // 20%，最小300px，最大50%
+  }
+}
+
+/**
  * 初始状态
  */
-const initialState = {
-  layers: [],
-  edges: [],
-  metadata: null,
-  nodePositions: {},
-  selectedNodeIds: [],
-  isImportDialogOpen: false,
-  isExportDialogOpen: false,
-  confirmDialog: {
-    isOpen: false,
-    title: "",
-    message: "",
-    onConfirm: null,
-    onCancel: null,
-  },
-  contextMenu: {
-    isOpen: false,
-    x: 0,
-    y: 0,
-    nodeId: null,
-    flowPosition: undefined,
-  },
-  lastSaved: null,
-  needsSave: false,
+const getInitialState = () => {
+  const widths = getInitialSidebarWidths()
+  return {
+    layers: [],
+    edges: [],
+    metadata: null,
+    nodePositions: {},
+    selectedNodeIds: [],
+    isImportDialogOpen: false,
+    isExportDialogOpen: false,
+    confirmDialog: {
+      isOpen: false,
+      title: "",
+      message: "",
+      onConfirm: null,
+      onCancel: null,
+    },
+    contextMenu: {
+      isOpen: false,
+      x: 0,
+      y: 0,
+      nodeId: null,
+      flowPosition: undefined,
+    },
+    lastSaved: null,
+    needsSave: false,
+    leftSidebarWidth: widths.left,
+    rightSidebarWidth: widths.right,
+  }
 }
 
 /**
  * Zustand Store
  */
 export const useSandboxStore = create<SandboxState>((set, get) => ({
-  ...initialState,
+  ...getInitialState(),
 
   // 选中节点管理
   setSelectedNodeIds: (ids) => set({ selectedNodeIds: ids }),
@@ -308,17 +333,39 @@ export const useSandboxStore = create<SandboxState>((set, get) => ({
   markSaved: () => set({ lastSaved: Date.now(), needsSave: false }),
   setNeedsSave: (needs) => set({ needsSave: needs }),
 
+  // 侧边栏宽度管理
+  setLeftSidebarWidth: (width) => {
+    const minWidth = 200
+    const maxWidth = typeof window !== "undefined" ? window.innerWidth * 0.4 : 800
+    set({ leftSidebarWidth: Math.max(minWidth, Math.min(width, maxWidth)) })
+  },
+  setRightSidebarWidth: (width) => {
+    const minWidth = 300
+    const maxWidth = typeof window !== "undefined" ? window.innerWidth * 0.5 : 1000
+    set({ rightSidebarWidth: Math.max(minWidth, Math.min(width, maxWidth)) })
+  },
+
   // 从localStorage加载
   loadFromStorage: () => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const data = JSON.parse(stored)
+        const initialWidths = getInitialSidebarWidths()
         set({
           layers: data.layers || [],
           edges: data.edges || [],
           metadata: data.metadata || null,
+          leftSidebarWidth: data.leftSidebarWidth || initialWidths.left,
+          rightSidebarWidth: data.rightSidebarWidth || initialWidths.right,
           needsSave: false,
+        })
+      } else {
+        // 如果没有存储的数据，使用初始宽度
+        const initialWidths = getInitialSidebarWidths()
+        set({
+          leftSidebarWidth: initialWidths.left,
+          rightSidebarWidth: initialWidths.right,
         })
       }
     } catch (error) {
@@ -334,6 +381,8 @@ export const useSandboxStore = create<SandboxState>((set, get) => ({
         layers: state.layers,
         edges: state.edges,
         metadata: state.metadata,
+        leftSidebarWidth: state.leftSidebarWidth,
+        rightSidebarWidth: state.rightSidebarWidth,
         savedAt: Date.now(),
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
