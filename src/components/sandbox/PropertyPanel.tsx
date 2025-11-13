@@ -23,13 +23,15 @@ import type { Layer, LayerType, SequentialLayer, ParallelLayer, ParallelBranch }
 
 /**
  * 提取可编辑字段
- * 基于规则判断显示哪些字段：
- * - null/undefined 不显示
- * - 数字0不显示（但数组中的0要显示）
- * - outputShape 始终显示
- * - 排除 id、name、type、description、steps、branches、color
+ * - sequential和parallel节点不显示参数详情（由内部节点决定）
+ * - 其他节点基于规则判断显示哪些字段
  */
 function extractEditableFields(layer: Layer): string[] {
+  // sequential和parallel节点的参数由内部节点决定，不显示参数详情
+  if (layer.type === "sequential" || layer.type === "parallel") {
+    return []
+  }
+  
   const fields: string[] = []
   const excludeFields = ['id', 'name', 'type', 'description', 'steps', 'branches', 'color']
   
@@ -53,11 +55,6 @@ function extractEditableFields(layer: Layer): string[] {
     if (typeof value === 'number' && value === 0) continue
     
     fields.push(key)
-  }
-  
-  // 确保outputShape在列表中（如果存在且不为null/undefined）
-  if (layer.outputShape !== undefined && layer.outputShape !== null && !fields.includes('outputShape')) {
-    fields.push('outputShape')
   }
   
   // 将outputShape放在最后
@@ -172,90 +169,25 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
     [tempValues, handleFieldChange]
   )
 
-  // 临时存储数组字段的输入值
-  const [tempArrayValues, setTempArrayValues] = useState<Record<string, Record<number, string>>>({})
-
-  // 更新数组字段（用于onBlur）
+  // 更新数组字段（简化版本：直接更新）
   const handleArrayFieldChange = useCallback(
     (field: string, index: number, value: string) => {
       if (!selectedNode) return
       const currentValue = (selectedNode as any)[field] as number[] | undefined
       const newArray = [...(currentValue || [])]
       
-      // 如果值为空，保持原值
+      // 如果值为空字符串，设为0
       if (value === "" || value === null || value === undefined) {
-        return
+        newArray[index] = 0
+      } else {
+        const numValue = Number(value)
+        // 如果是有效数字，更新；否则设为0
+        newArray[index] = isNaN(numValue) ? 0 : numValue
       }
       
-      const numValue = Number(value)
-      if (isNaN(numValue)) return // 无效数字不更新
-      
-      newArray[index] = numValue
       updateLayer(selectedNode.id, { [field]: newArray })
     },
     [selectedNode, updateLayer]
-  )
-
-  // 数组字段输入变化
-  const handleArrayFieldInputChange = useCallback(
-    (field: string, index: number, value: string, previousValue?: number) => {
-      // 更新临时值
-      setTempArrayValues(prev => ({
-        ...prev,
-        [field]: {
-          ...prev[field],
-          [index]: value
-        }
-      }))
-      
-      // 检测是否是+1/-1按钮操作（值变化正好是step的大小）
-      if (previousValue !== undefined && value !== "" && value !== null && value !== undefined) {
-        const numValue = Number(value)
-        if (!isNaN(numValue)) {
-          const diff = Math.abs(numValue - previousValue)
-          // 如果差值正好是1，可能是+1/-1按钮操作，立即更新
-          if (diff === 1) {
-            handleArrayFieldChange(field, index, value)
-            // 清除临时值，因为已经更新了
-            setTempArrayValues(prev => {
-              const newValues = { ...prev }
-              if (newValues[field]) {
-                delete newValues[field][index]
-                if (Object.keys(newValues[field]).length === 0) {
-                  delete newValues[field]
-                }
-              }
-              return newValues
-            })
-          }
-        }
-      }
-    },
-    [handleArrayFieldChange]
-  )
-
-  // 数组字段失去焦点时更新
-  const handleArrayFieldBlur = useCallback(
-    (field: string, index: number) => {
-      const tempValue = tempArrayValues[field]?.[index]
-      // 清除临时值
-      setTempArrayValues(prev => {
-        const newValues = { ...prev }
-        if (newValues[field]) {
-          delete newValues[field][index]
-          if (Object.keys(newValues[field]).length === 0) {
-            delete newValues[field]
-          }
-        }
-        return newValues
-      })
-      
-      // 如果临时值存在，使用临时值更新（与ChildNodeEditor保持一致）
-      if (tempValue !== undefined) {
-        handleArrayFieldChange(field, index, tempValue)
-      }
-    },
-    [tempArrayValues, handleArrayFieldChange]
   )
 
   // 添加数组元素
@@ -466,19 +398,13 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
         return (
           <div className="space-y-2">
             {shapeArray.map((item, index) => {
-              const tempValue = tempArrayValues[field]?.[index]
-              // 与ChildNodeEditor保持一致：如果tempArrayValues中有值，使用它；否则使用实际值
-              const displayValue = tempValue !== undefined ? tempValue : item
               return (
               <div key={index} className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground w-8 shrink-0">[{index}]</span>
                 <input
                   type="number"
-                  value={displayValue}
-                  onChange={(e) =>
-                    handleArrayFieldInputChange(field, index, e.target.value, item)
-                  }
-                  onBlur={() => handleArrayFieldBlur(field, index)}
+                  value={item ?? 0}
+                  onChange={(e) => handleArrayFieldChange(field, index, e.target.value)}
                   step="1"
                   className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-sm"
                   placeholder={`维度 ${index}`}
@@ -520,18 +446,12 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
         return (
           <div className="space-y-2">
             {arrayValue.map((item, index) => {
-              const tempValue = tempArrayValues[field]?.[index]
-              // 与ChildNodeEditor保持一致：如果tempArrayValues中有值，使用它；否则使用实际值
-              const displayValue = tempValue !== undefined ? tempValue : item
               return (
               <div key={index} className="flex items-center gap-2">
                 <input
                   type="number"
-                  value={displayValue}
-                  onChange={(e) =>
-                    handleArrayFieldInputChange(field, index, e.target.value, item)
-                  }
-                  onBlur={() => handleArrayFieldBlur(field, index)}
+                  value={item ?? 0}
+                  onChange={(e) => handleArrayFieldChange(field, index, e.target.value)}
                   step="1"
                   className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-sm"
                   placeholder={`元素 ${index + 1}`}
@@ -787,18 +707,6 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
             <h4 className="text-sm font-semibold mb-3">参数详情</h4>
             <div className="space-y-2">
               {editableFields.map((field) => {
-                const fieldValue = (selectedNode as any)[field]
-                // 再次检查（防止在提取后值变为null/undefined）
-                if (fieldValue === null || fieldValue === undefined) {
-                  return null
-                }
-                // 数字0不显示（但数组中的0要显示）
-                if (typeof fieldValue === 'number' && fieldValue === 0) {
-                  return null
-                }
-                const isHighlight = field === 'outputShape'
-                const highlightColor = isHighlight && theme ? theme.textHighlight : "text-foreground"
-                
                 return (
                   <div key={field} className="py-2 px-3 rounded-lg bg-muted/50 space-y-1.5">
                     <div className="text-sm text-muted-foreground">{getFieldLabel(field)}</div>
@@ -831,18 +739,29 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
     const fields: string[] = []
     const excludeFields = ['id', 'name', 'type', 'description', 'steps', 'branches', 'color']
     
+    // 已知的数组字段，即使为空也要显示
+    const knownArrayFields = ['outputShape', 'kernelSize', 'stride', 'padding', 'poolSize']
+    
     for (const key in layer) {
       if (excludeFields.includes(key)) continue
       const value = (layer as any)[key]
+      
+      // null/undefined 不显示
       if (value === null || value === undefined) continue
+      
+      // 数组字段（包括空数组）都要显示
+      if (Array.isArray(value) || knownArrayFields.includes(key)) {
+        fields.push(key)
+        continue
+      }
+      
+      // 数字0不显示（但数组中的0要显示）
       if (typeof value === 'number' && value === 0) continue
+      
       fields.push(key)
     }
     
-    if (layer.outputShape !== undefined && layer.outputShape !== null && !fields.includes('outputShape')) {
-      fields.push('outputShape')
-    }
-    
+    // 将outputShape放在最后
     const outputShapeIndex = fields.indexOf('outputShape')
     if (outputShapeIndex !== -1) {
       fields.splice(outputShapeIndex, 1)
@@ -852,9 +771,8 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
     return fields
   }, [layer])
 
-  // 临时存储输入值
+  // 临时存储输入值（用于非数组字段）
   const [tempValues, setTempValues] = useState<Record<string, string>>({})
-  const [tempArrayValues, setTempArrayValues] = useState<Record<string, Record<number, string>>>({})
 
   const handleFieldChange = useCallback((field: string, value: any) => {
     if (value === "" || value === null || value === undefined) {
@@ -888,44 +806,22 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
     }
   }, [tempValues, handleFieldChange])
 
+  // 更新数组字段（简化版本：直接更新）
   const handleArrayFieldChange = useCallback((field: string, index: number, value: string) => {
-    if (value === "" || value === null || value === undefined) {
-      return
-    }
     const currentValue = (layer as any)[field] as number[] | undefined
     const newArray = [...(currentValue || [])]
-    const numValue = Number(value)
-    if (isNaN(numValue)) return
-    newArray[index] = numValue
+    
+    // 如果值为空字符串，设为0
+    if (value === "" || value === null || value === undefined) {
+      newArray[index] = 0
+    } else {
+      const numValue = Number(value)
+      // 如果是有效数字，更新；否则设为0
+      newArray[index] = isNaN(numValue) ? 0 : numValue
+    }
+    
     onUpdate({ [field]: newArray })
   }, [layer, onUpdate])
-
-  const handleArrayFieldInputChange = useCallback((field: string, index: number, value: string) => {
-    setTempArrayValues(prev => ({
-      ...prev,
-      [field]: {
-        ...prev[field],
-        [index]: value
-      }
-    }))
-  }, [])
-
-  const handleArrayFieldBlur = useCallback((field: string, index: number) => {
-    const tempValue = tempArrayValues[field]?.[index]
-    if (tempValue !== undefined) {
-      handleArrayFieldChange(field, index, tempValue)
-      setTempArrayValues(prev => {
-        const newValues = { ...prev }
-        if (newValues[field]) {
-          delete newValues[field][index]
-          if (Object.keys(newValues[field]).length === 0) {
-            delete newValues[field]
-          }
-        }
-        return newValues
-      })
-    }
-  }, [tempArrayValues, handleArrayFieldChange])
 
   const handleAddArrayElement = useCallback((field: string) => {
     const currentValue = (layer as any)[field] as number[] | undefined
@@ -952,16 +848,13 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
       return (
         <div className="space-y-2">
           {shapeArray.map((item, index) => {
-            const tempValue = tempArrayValues[field]?.[index]
-            const displayValue = tempValue !== undefined ? tempValue : item
             return (
             <div key={index} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-6 shrink-0">[{index}]</span>
               <input
                 type="number"
-                value={displayValue}
-                onChange={(e) => handleArrayFieldInputChange(field, index, e.target.value)}
-                onBlur={() => handleArrayFieldBlur(field, index)}
+                value={item ?? 0}
+                onChange={(e) => handleArrayFieldChange(field, index, e.target.value)}
                 className="flex-1 px-2 py-1 text-xs border border-border rounded bg-background"
                 placeholder={`维度 ${index}`}
               />
@@ -995,15 +888,12 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
       return (
         <div className="space-y-2">
           {fieldValue.map((item, index) => {
-            const tempValue = tempArrayValues[field]?.[index]
-            const displayValue = tempValue !== undefined ? tempValue : item
             return (
             <div key={index} className="flex items-center gap-2">
               <input
                 type="number"
-                value={displayValue}
-                onChange={(e) => handleArrayFieldInputChange(field, index, e.target.value)}
-                onBlur={() => handleArrayFieldBlur(field, index)}
+                value={item ?? 0}
+                onChange={(e) => handleArrayFieldChange(field, index, e.target.value)}
                 className="flex-1 px-2 py-1 text-xs border border-border rounded bg-background"
                 placeholder={`元素 ${index + 1}`}
               />
@@ -1118,14 +1008,22 @@ function ChildNodeEditor({ layer, onUpdate }: ChildNodeEditorProps) {
         className="w-full px-2 py-1 text-xs border border-border rounded bg-background"
       />
     )
-  }, [layer, tempValues, tempArrayValues, handleFieldChange, handleFieldInputChange, handleFieldBlur, handleArrayFieldChange, handleArrayFieldInputChange, handleArrayFieldBlur, handleAddArrayElement, handleRemoveArrayElement])
+  }, [layer, tempValues, handleFieldChange, handleFieldInputChange, handleFieldBlur, handleArrayFieldChange, handleAddArrayElement, handleRemoveArrayElement])
 
   return (
     <div className="p-3 border-t border-border bg-background space-y-3 max-h-96 overflow-y-auto">
       {editableFields.map((field) => {
         const fieldValue = (layer as any)[field]
-        if (fieldValue === null || fieldValue === undefined) return null
-        if (typeof fieldValue === 'number' && fieldValue === 0) return null
+        
+        // 已知的数组字段（包括outputShape），即使为空数组或undefined也要显示
+        const knownArrayFields = ['outputShape', 'kernelSize', 'stride', 'padding', 'poolSize']
+        const isKnownArrayField = knownArrayFields.includes(field)
+        
+        // 对于非数组字段，如果值为null/undefined或数字0，不显示
+        if (!isKnownArrayField && !Array.isArray(fieldValue)) {
+          if (fieldValue === null || fieldValue === undefined) return null
+          if (typeof fieldValue === 'number' && fieldValue === 0) return null
+        }
         
         return (
           <div key={field}>

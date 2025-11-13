@@ -31,6 +31,7 @@ const FIELD_LABEL_MAP: Record<string, string> = {
   headDim: "单头维度",
   modelDim: "模型维度",
   dropout: "Dropout",
+  activation: "激活函数",
 };
 
 export const FIELD_ORDER_MAP: Record<string, string[]> = {
