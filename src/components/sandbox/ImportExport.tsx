@@ -15,14 +15,14 @@
 import { useCallback, useRef, useState } from "react"
 import { X, FileText, Download, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
+import { useSandboxStore } from "@/lib/sandboxStore"
 import {
   exportToJSON,
   importFromJSON,
   downloadFile,
   readFile,
   generateExportFilename,
-} from "@/lib/sandbox/exportUtils"
+} from "@/lib/export"
 import type { ModelMetadata } from "@/lib/types"
 
 /**

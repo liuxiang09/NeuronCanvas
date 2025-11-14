@@ -14,6 +14,27 @@ export type NormType = "batchnorm" | "layernorm" | "lrn";
 /** 注意力类型 */
 export type AttentionType = "self-attention" | "cross-attention";
 
+/** 池化类型 */
+export type PoolingType = "maxpool2d" | "avgpool2d" | "adaptiveavgpool2d";
+
+/** 计算类型 */
+export type CalculateType = "add" | "concat" | "flatten";
+
+/** 特殊模块类型 */
+export type SpecialModuleType = "sequential" | "parallel";
+
+/** 卷积层类型 */
+export type ConvType = "conv2d";
+
+/** 线性层类型 */
+export type LinearType = "linear" | "input";
+
+/** 嵌入类型 */
+export type EmbeddingType = "embedding";
+
+/** Dropout类型 */
+export type DropoutType = "dropout";
+
 /**
  * 节点类型枚举
  *
@@ -21,29 +42,17 @@ export type AttentionType = "self-attention" | "cross-attention";
  * - 新增节点类型时，请同时补充对应的自定义节点组件
  */
 export type LayerType =
-  | "input"
-  | "embedding"
-  | "flatten"
-  | "linear"
-  | "conv2d"
-  | "maxpool2d"
-  | "avgpool2d"
-  | "adaptiveavgpool2d"
+  | EmbeddingType
+  | DropoutType
+  | LinearType
+  | ConvType
+  | PoolingType
   | AttentionType
   | NormType
   | ActivationType
-  | "dropout"
-  | "add"
-  | "concat"
-  | "sequential"
-  | "parallel";
+  | CalculateType
+  | SpecialModuleType;
 
-/**
- * 所有层共同的基础字段
- *
- * - `outputShape` 可为单形状或嵌套（如并行分支）
- * - 具体层的专有字段在各自接口中定义
- */
 export interface LayerBase {
   id: string;
   name: string;

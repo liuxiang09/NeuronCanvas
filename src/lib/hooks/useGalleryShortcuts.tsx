@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { useAppStore } from "@/lib/store"
+import { useGalleryStore } from "@/lib/galleryStore"
 
 /**
  * 键盘快捷键配置
@@ -26,7 +26,7 @@ interface UseKeyboardShortcutsOptions {
 }
 
 export function useKeyboardShortcuts(options?: UseKeyboardShortcutsOptions) {
-  const closeSidebar = useAppStore((state) => state.closeSidebar)
+  const closeSidebar = useGalleryStore((state) => state.closeSidebar)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

@@ -3,10 +3,18 @@
 应用的头部组件，包含 Logo、导航链接和外部资源链接。
 */
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Brain, Github, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
+  const pathname = usePathname()
+  
+  // 判断当前路径是否匹配导航链接
+  const isGalleryActive = pathname === "/gallery" || pathname?.startsWith("/models/")
+  const isSandboxActive = pathname === "/sandbox"
+  const isAboutActive = pathname === "/about"
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center">
@@ -32,19 +40,25 @@ export function Header() {
         <nav className="flex items-center gap-6 text-sm font-medium flex-1">
           <Link 
             href="/gallery" 
-            className="transition-colors hover:text-foreground/80 text-foreground"
+            className={`transition-colors hover:text-foreground/80 ${
+              isGalleryActive ? "text-foreground" : "text-muted-foreground"
+            }`}
           >
             模型画廊
           </Link>
           <Link 
             href="/sandbox" 
-            className="transition-colors hover:text-foreground/80 text-muted-foreground"
+            className={`transition-colors hover:text-foreground/80 ${
+              isSandboxActive ? "text-foreground" : "text-muted-foreground"
+            }`}
           >
             沙盒模式
           </Link>
           <Link 
             href="/about" 
-            className="transition-colors hover:text-foreground/80 text-muted-foreground"
+            className={`transition-colors hover:text-foreground/80 ${
+              isAboutActive ? "text-foreground" : "text-muted-foreground"
+            }`}
           >
             关于
           </Link>

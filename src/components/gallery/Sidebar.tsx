@@ -2,11 +2,10 @@
 
 import { X, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { KeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts"
+import { KeyboardShortcuts } from "@/lib/hooks/useGalleryShortcuts"
 import type { Layer, SequentialLayer, ParallelLayer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
-import { getLayerIcon, getLayerParams } from "@/lib/fieldMapping"
-import { formatFieldValue } from "@/lib/fieldMapping"
+import { formatFieldValue, getLayerIcon, getLayerParams } from "@/lib/utils"
 
 interface SidebarProps {
   isOpen: boolean
@@ -15,7 +14,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose, selectedNode }: SidebarProps) {
-  const Icon = selectedNode ? getLayerIcon(selectedNode.type) : Info
+  const Icon = selectedNode ? getLayerIcon(selectedNode) : Info
   const params = selectedNode ? getLayerParams(selectedNode) : []
   const theme = selectedNode ? getLayerColorTheme(selectedNode) : null
   return (
@@ -298,7 +297,7 @@ function SequentialLayerItem({
 }) {
   const params = getLayerParams(layer)
   const layerTheme = getLayerColorTheme(layer)
-  const Icon = getLayerIcon(layer.type)
+  const Icon = getLayerIcon(layer)
 
   return (
     <div className="bg-background rounded-md border border-border overflow-hidden">

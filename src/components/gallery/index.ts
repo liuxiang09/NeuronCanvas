@@ -3,3 +3,4 @@
  */
 
 export { ModelCanvas } from "./ModelCanvas"
+export { Sidebar } from "./Sidebar"

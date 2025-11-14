@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Search, Filter, Calendar, Users, ArrowRight, Sparkles, Quote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Model } from "@/lib/types"
-import { listCategories, listTags, searchModels } from "@/lib/modelRegistry"
+import { listCategories, listTags, searchModels } from "@/registry/modelRegistry"
 
 // 所有可用的分类
 const categories = listCategories()

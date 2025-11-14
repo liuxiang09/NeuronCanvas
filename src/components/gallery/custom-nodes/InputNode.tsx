@@ -2,15 +2,15 @@ import { memo } from "react"
 import { Handle, Position } from "reactflow"
 import type { Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
-import { renderLayerFields } from "@/lib/hooks/nodeRender"
-import { ICON_MAP } from "@/lib/fieldMapping"
+import { renderLayerFields } from "@/lib/render"
+import { ICON_MAP } from "@/lib/mapping"
 
-interface ConvNodeProps {
+interface InputNodeProps {
   data: Layer
   selected?: boolean
 }
 
-export const ConvNode = memo(({ data, selected }: ConvNodeProps) => {
+export const InputNode = memo(({ data, selected }: InputNodeProps) => {
   const theme = getLayerColorTheme(data)
   const Icon = ICON_MAP[data.type]
 
@@ -26,13 +26,6 @@ export const ConvNode = memo(({ data, selected }: ConvNodeProps) => {
         ${selected ? theme.borderSelected : theme.borderUnselected}
       `}
     >
-      {/* 输入 Handle */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        className={`!w-3 !h-3 ${theme.handle} !border-2 !border-white`}
-      />
-
       {/* 头部渐变条 */}
       <div className={`h-2 rounded-t-lg bg-gradient-to-r ${theme.head}`} />
 
@@ -53,7 +46,7 @@ export const ConvNode = memo(({ data, selected }: ConvNodeProps) => {
         {renderLayerFields(data, theme)}
       </div>
 
-      {/* 输出 Handle */}
+      {/* 输出 Handle (只有右侧) */}
       <Handle
         type="source"
         position={Position.Right}
@@ -63,7 +56,7 @@ export const ConvNode = memo(({ data, selected }: ConvNodeProps) => {
       <div className="absolute bottom-2 right-2 opacity-5">
         <Icon className={`w-12 h-12 ${theme.textHighlight}`} />
       </div>
-      {/* 悬浮效果 */}
+      {/* Hover 发光效果 */}
       <div className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />
     </div>
   )

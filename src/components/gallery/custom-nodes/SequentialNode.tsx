@@ -3,8 +3,9 @@ import { Handle, Position } from "reactflow"
 import { Layers } from "lucide-react"
 import type { SequentialLayer, Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
-import { renderLayerFields } from "@/lib/hooks/nodeRender"
-import { ICON_MAP, formatFieldValue } from "@/lib/fieldMapping"
+import { renderLayerFields } from "@/lib/render"
+import { ICON_MAP} from "@/lib/mapping"
+import { formatFieldValue } from "@/lib/utils"
 
 interface SequentialNodeProps {
   data: SequentialLayer

@@ -17,7 +17,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css"
 import { Info, ZoomIn, ZoomOut, Maximize2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useAppStore } from "@/lib/store"
+import { useGalleryStore } from "@/lib/galleryStore"
 
 // 导入节点和边的映射配置
 import { nodeComponents } from "./custom-nodes"
@@ -51,11 +51,11 @@ function ModelCanvasInner({
   const { zoomIn, zoomOut, fitView, getViewport } = reactFlowInstance
 
   // Zustand 状态
-  const setZoomLevel = useAppStore((state) => state.setZoomLevel)
-  const zoomLevel = useAppStore((state) => state.zoomLevel)
-  const canvasActionsRef = useAppStore((state) => state.canvasActionsRef)
-  const isSidebarOpen = useAppStore((state) => state.isSidebarOpen)
-  const setSelectedNode = useAppStore((state) => state.setSelectedNode)
+  const setZoomLevel = useGalleryStore((state) => state.setZoomLevel)
+  const zoomLevel = useGalleryStore((state) => state.zoomLevel)
+  const canvasActionsRef = useGalleryStore((state) => state.canvasActionsRef)
+  const isSidebarOpen = useGalleryStore((state) => state.isSidebarOpen)
+  const setSelectedNode = useGalleryStore((state) => state.setSelectedNode)
 
   // 快捷操作
   const handleZoomIn = useCallback(() => {

@@ -1,6 +1,6 @@
-import { getFieldLabel, getFieldOrder, formatFieldValue } from "../fieldMapping"
-import type { Layer } from "../types"
-import type { LayerColorTheme } from "../theme"
+import { getFieldLabel, getFieldOrder, formatFieldValue } from "./utils"
+import type { Layer } from "./types"
+import type { LayerColorTheme } from "./theme"
 
 /**
  * 需要高亮显示的字段（使用层的主题色）
@@ -20,7 +20,7 @@ const BORDER_FIELDS = ["outputShape"]
  */
 export function renderLayerFields(layer: Layer, theme: LayerColorTheme) {
   // 获取该层类型应该显示的字段顺序
-  const fieldOrder = getFieldOrder(layer.type)
+  const fieldOrder = getFieldOrder(layer)
 
   return (
     <div className="space-y-1.5">

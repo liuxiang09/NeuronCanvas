@@ -1,16 +1,16 @@
 "use client"
 
-import { useEffect, useCallback } from "react"
+import { useEffect, useCallback, useState } from "react"
 import { useParams } from "next/navigation"
-import { ArrowLeft, Calendar, Users, FileText, ExternalLink } from "lucide-react"
+import { ArrowLeft, Calendar, Users, FileText, ExternalLink, ChevronUp, ChevronDown } from "lucide-react"
 import Link from "next/link"
-import { ModelCanvas } from "@/components/canvas"
-import { Sidebar } from "@/components/layout/Sidebar"
+import { ModelCanvas } from "@/components/gallery"
+import { Sidebar } from "@/components/gallery/Sidebar"
 import { Button } from "@/components/ui/button"
 import { calculateLayout } from "@/lib/layout"
-import { useAppStore } from "@/lib/store"
-import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts"
-import { getModelByName } from "@/lib/modelRegistry"
+import { useGalleryStore } from "@/lib/galleryStore"
+import { useKeyboardShortcuts } from "@/lib/hooks/useGalleryShortcuts"
+import { getModelByName } from "@/registry/modelRegistry"
 import type { Model } from "@/lib/types"
 
 export default function ModelPage() {
@@ -20,15 +20,18 @@ export default function ModelPage() {
   // 获取模型数据
   const model = getModelByName(modelName)
 
+  // 信息卡片展开/收起状态
+  const [isInfoCardCollapsed, setIsInfoCardCollapsed] = useState(false)
+
   // 从 Zustand store 获取状态
-  const selectedNode = useAppStore((state) => state.selectedNode)
-  const setSelectedNode = useAppStore((state) => state.setSelectedNode)
-  const isSidebarOpen = useAppStore((state) => state.isSidebarOpen)
-  const closeSidebar = useAppStore((state) => state.closeSidebar)
-  const reset = useAppStore((state) => state.reset)
+  const selectedNode = useGalleryStore((state) => state.selectedNode)
+  const setSelectedNode = useGalleryStore((state) => state.setSelectedNode)
+  const isSidebarOpen = useGalleryStore((state) => state.isSidebarOpen)
+  const closeSidebar = useGalleryStore((state) => state.closeSidebar)
+  const reset = useGalleryStore((state) => state.reset)
 
   // 画布操作引用（将在 ModelCanvas 中设置）
-  const canvasActionsRef = useAppStore((state) => state.canvasActionsRef)
+  const canvasActionsRef = useGalleryStore((state) => state.canvasActionsRef)
 
   // 启用键盘快捷键，传入画布操作
   useKeyboardShortcuts({
@@ -82,83 +85,115 @@ export default function ModelPage() {
         {/* 模型信息头部 */}
         <div className="border-b border-border bg-background">
           <div className="container max-w-screen-2xl py-6 px-4">
-            {/* 返回按钮 */}
-            <Button variant="ghost" size="sm" asChild className="mb-4">
-              <Link href="/gallery">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                返回画廊
-              </Link>
-            </Button>
+            {!isInfoCardCollapsed && (
+              <>
+                {/* 返回按钮 */}
+                <Button variant="ghost" size="sm" asChild className="mb-4">
+                  <Link href="/gallery">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    返回画廊
+                  </Link>
+                </Button>
 
-            {/* 模型标题 */}
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">
-                  {model.metadata.displayName}
-                </h1>
-                <p className="text-muted-foreground max-w-3xl">
-                  {model.metadata.description}
-                </p>
-              </div>
+                {/* 模型标题 */}
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <h1 className="text-3xl font-bold mb-2">
+                      {model.metadata.displayName}
+                    </h1>
+                    <p className="text-muted-foreground max-w-3xl">
+                      {model.metadata.description}
+                    </p>
+                  </div>
 
-              {/* 查看详情按钮 (移动端) */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => useAppStore.getState().openSidebar()}
-                className="lg:hidden"
-              >
-                查看详情
-              </Button>
-            </div>
-
-            {/* 元数据标签 */}
-            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-              {model.metadata.year && (
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4" />
-                  <span>{model.metadata.year}</span>
-                </div>
-              )}
-
-              {model.metadata.authors && model.metadata.authors.length > 0 && (
-                <div className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4" />
-                  <span>{model.metadata.authors.join(", ")}</span>
-                </div>
-              )}
-
-              {model.metadata.category && (
-                <div className="flex items-center gap-1.5">
-                  <FileText className="w-4 h-4" />
-                  <span>{model.metadata.category}</span>
-                </div>
-              )}
-
-              {model.metadata.paper && (
-                <a
-                  href={model.metadata.paper}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-primary transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>查看论文</span>
-                </a>
-              )}
-            </div>
-
-            {/* 标签 */}
-            {model.metadata.tags && model.metadata.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {model.metadata.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2.5 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary"
+                  {/* 查看详情按钮 (移动端) */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => useGalleryStore.getState().openSidebar()}
+                    className="lg:hidden"
                   >
-                    {tag}
-                  </span>
-                ))}
+                    查看详情
+                  </Button>
+                </div>
+
+                {/* 元数据标签 */}
+                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                  {model.metadata.year && (
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-4 h-4" />
+                      <span>{model.metadata.year}</span>
+                    </div>
+                  )}
+
+                  {model.metadata.authors && model.metadata.authors.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-4 h-4" />
+                      <span>{model.metadata.authors.join(", ")}</span>
+                    </div>
+                  )}
+
+                  {model.metadata.category && (
+                    <div className="flex items-center gap-1.5">
+                      <FileText className="w-4 h-4" />
+                      <span>{model.metadata.category}</span>
+                    </div>
+                  )}
+
+                  {model.metadata.paper && (
+                    <a
+                      href={model.metadata.paper}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span>查看论文</span>
+                    </a>
+                  )}
+                </div>
+
+                {/* 标签 */}
+                {model.metadata.tags && model.metadata.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {model.metadata.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2.5 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* 回收/展开按钮 */}
+                <div className="flex justify-center mt-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsInfoCardCollapsed(!isInfoCardCollapsed)}
+                    className="gap-2"
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                    <span>收起</span>
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {/* 展开按钮（当信息卡片收起时显示） */}
+            {isInfoCardCollapsed && (
+              <div className="flex justify-center py-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsInfoCardCollapsed(false)}
+                  className="gap-2"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                  <span>展开信息</span>
+                </Button>
               </div>
             )}
           </div>

@@ -17,12 +17,12 @@ import { useEffect, useCallback } from "react"
 import { SandboxCanvas } from "@/components/sandbox/SandboxCanvas"
 import { NodeToolbar } from "@/components/sandbox/NodeToolbar"
 import { PropertyPanel } from "@/components/sandbox/PropertyPanel"
-import { Toolbar } from "@/components/sandbox/Toolbar"
-import { ImportExportDialog } from "@/components/sandbox/ImportExportDialog"
+import { HeadToolbar } from "@/components/sandbox/HeadToolbar"
+import { ImportExportDialog } from "@/components/sandbox/ImportExport"
 import { ConfirmDialog } from "@/components/sandbox/ConfirmDialog"
 import { ContextMenu } from "@/components/sandbox/ContextMenu"
 import { Resizer } from "@/components/sandbox/Resizer"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
+import { useSandboxStore } from "@/lib/sandboxStore"
 import { useSandboxShortcuts } from "@/lib/hooks/useSandboxShortcuts"
 
 /**
@@ -85,12 +85,12 @@ export default function SandboxPage() {
   }, [])
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem-3.5rem)]">
+    <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
       {/* 顶部工具栏 */}
-      <Toolbar />
+      <HeadToolbar />
 
       {/* 主内容区域 */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* 左侧节点工具栏 */}
         <div style={{ width: `${leftSidebarWidth}px`, minWidth: `${leftSidebarWidth}px`, maxWidth: `${leftSidebarWidth}px` }}>
           <NodeToolbar />

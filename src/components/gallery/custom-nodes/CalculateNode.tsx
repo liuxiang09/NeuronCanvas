@@ -2,18 +2,19 @@ import { memo } from "react"
 import { Handle, Position } from "reactflow"
 import type { Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
-import { renderLayerFields } from "@/lib/hooks/nodeRender"
-import { ICON_MAP } from "@/lib/fieldMapping"
+import { renderLayerFields } from "@/lib/render"
+import { ICON_MAP } from "@/lib/mapping"
 
-interface DropoutNodeProps {
-  data: Layer,
+
+interface CalculateNodeProps {
+  data: Layer
   selected?: boolean
 }
 
-export const DropoutNode = memo(({ data, selected }: DropoutNodeProps) => {
+export const CalculateNode = memo(({ data, selected }: CalculateNodeProps) => {
   const theme = getLayerColorTheme(data)
   const Icon = ICON_MAP[data.type]
-  
+
   return (
     <div
       className={`
@@ -26,19 +27,15 @@ export const DropoutNode = memo(({ data, selected }: DropoutNodeProps) => {
         ${selected ? theme.borderSelected : theme.borderUnselected}
       `}
     >
-      {/* 输入 Handle */}
       <Handle
         type="target"
         position={Position.Left}
         className={`!w-3 !h-3 ${theme.handle} !border-2 !border-white`}
       />
 
-      {/* 头部渐变条 */}
       <div className={`h-2 rounded-t-lg bg-gradient-to-r ${theme.head}`} />
 
-      {/* 内容区域 */}
       <div className="p-4">
-        {/* 标题区 */}
         <div className="flex items-center gap-2 mb-3">
           <div className={`p-1.5 rounded-lg ${theme.background}`}>
             <Icon className={`w-4 h-4 ${theme.textHighlight}`} />
@@ -49,25 +46,20 @@ export const DropoutNode = memo(({ data, selected }: DropoutNodeProps) => {
           </div>
         </div>
 
-        {/* 参数信息 */}
         {renderLayerFields(data, theme)}
       </div>
 
-      {/* 输出 Handle */}
       <Handle
         type="source"
         position={Position.Right}
         className={`!w-3 !h-3 ${theme.handle} !border-2 !border-white`}
       />
-
       {/* 装饰性图标 */}
       <div className="absolute bottom-2 right-2 opacity-5">
         <Icon className={`w-12 h-12 ${theme.textHighlight}`} />
       </div>
       {/* 悬浮效果 */}
-      <div
-        className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`}
-      />
+      <div className={`absolute inset-0 rounded-xl ${theme.backgroundHover} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`} />
     </div>
   )
 })

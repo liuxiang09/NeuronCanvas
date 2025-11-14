@@ -3,9 +3,9 @@ import { Handle, Position } from "reactflow"
 import { Layers } from "lucide-react"
 import type { ParallelLayer, Layer } from "@/lib/types"
 import { getLayerColorTheme } from "@/lib/theme"
-import { renderLayerFields } from "@/lib/hooks/nodeRender"
-import { formatFieldValue } from "@/lib/fieldMapping"
-import { ICON_MAP } from "@/lib/fieldMapping"
+import { renderLayerFields } from "@/lib/render"
+import { formatFieldValue } from "@/lib/utils"
+import { ICON_MAP } from "@/lib/mapping"
 
 interface ParallelNodeProps {
   data: ParallelLayer,

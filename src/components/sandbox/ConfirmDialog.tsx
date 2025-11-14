@@ -13,7 +13,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
+import { useSandboxStore } from "@/lib/sandboxStore"
 import { AlertTriangle } from "lucide-react"
 
 /**

@@ -11,11 +11,11 @@
 "use client"
 
 import { useCallback, useEffect, useRef } from "react"
-import { Plus } from "lucide-react"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
-import { createNodeByType, getAvailableNodeTypes } from "@/lib/sandbox/nodeFactory"
-import { getNodeTypeName } from "@/lib/fieldMapping"
-import type { LayerType } from "@/lib/types"
+import { Plus, Copy, ClipboardPaste, Trash2 } from "lucide-react"
+import { useSandboxStore } from "@/lib/sandboxStore"
+import { createNodeByType, getAvailableNodeTypes, generateNodeId } from "@/lib/nodeFactory"
+import { getNodeTypeName } from "@/lib/utils"
+import type { LayerType, Layer, SequentialLayer, ParallelLayer } from "@/lib/types"
 
 /**
  * ContextMenu - 右键上下文菜单
@@ -27,6 +27,9 @@ export function ContextMenu() {
   const addLayer = useSandboxStore((state) => state.addLayer)
   const removeLayer = useSandboxStore((state) => state.removeLayer)
   const showConfirmDialog = useSandboxStore((state) => state.showConfirmDialog)
+  const clipboard = useSandboxStore((state) => state.clipboard)
+  const copyToClipboard = useSandboxStore((state) => state.copyToClipboard)
+  const layers = useSandboxStore((state) => state.layers)
   const menuRef = useRef<HTMLDivElement>(null)
 
   // 点击外部关闭菜单
@@ -62,6 +65,27 @@ export function ContextMenu() {
     [addLayer, closeContextMenu, contextMenu.flowPosition]
   )
 
+  // 复制节点
+  const handleCopyNode = useCallback(() => {
+    if (!contextMenu.nodeId) return
+    
+    const node = layers.find((layer) => layer.id === contextMenu.nodeId)
+    if (node) {
+      copyToClipboard(node)
+      closeContextMenu()
+    }
+  }, [contextMenu.nodeId, layers, copyToClipboard, closeContextMenu])
+
+  // 粘贴节点
+  const handlePasteNode = useCallback(() => {
+    if (!clipboard || !contextMenu.flowPosition) return
+    
+    const pasteNodeAtPosition = useSandboxStore.getState().pasteNodeAtPosition
+    pasteNodeAtPosition(contextMenu.flowPosition)
+    
+    closeContextMenu()
+  }, [clipboard, contextMenu.flowPosition, closeContextMenu])
+
   // 删除节点
   const handleDeleteNode = useCallback(() => {
     if (!contextMenu.nodeId) return
@@ -93,15 +117,36 @@ export function ContextMenu() {
         // 节点右键菜单
         <div>
           <button
-            onClick={handleDeleteNode}
-            className="w-full px-4 py-2 text-left text-sm hover:bg-destructive/10 hover:text-destructive transition-colors"
+            onClick={handleCopyNode}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors flex items-center gap-2"
           >
+            <Copy className="h-3 w-3" />
+            复制节点
+          </button>
+          <button
+            onClick={handleDeleteNode}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-destructive/10 hover:text-destructive transition-colors flex items-center gap-2"
+          >
+            <Trash2 className="h-3 w-3" />
             删除节点
           </button>
         </div>
       ) : (
         // 画布右键菜单 - 添加节点
         <div>
+          <button
+            onClick={handlePasteNode}
+            disabled={!clipboard}
+            className={`w-full px-4 py-2 text-left text-sm transition-colors flex items-center gap-2 ${
+              clipboard
+                ? "hover:bg-muted"
+                : "text-muted-foreground cursor-not-allowed opacity-50"
+            }`}
+          >
+            <ClipboardPaste className="h-3 w-3" />
+            粘贴节点
+          </button>
+          <div className="border-t border-border my-1" />
           <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase">
             添加节点
           </div>

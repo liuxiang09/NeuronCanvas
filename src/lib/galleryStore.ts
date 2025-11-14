@@ -1,6 +1,10 @@
 /**
- * Zustand 全局状态管理
- * 管理应用的全局状态,包括选中的节点、侧边栏状态等
+ * galleryStore - Gallery专用状态管理
+ * 
+ * 功能说明：
+ * - 使用Zustand实现gallery模块的全局状态管理
+ * - 管理选中的节点、侧边栏状态、画布交互状态等
+ * - 用于模型展示页面（/models/[modelName]）
  */
 
 import { create } from "zustand"
@@ -17,9 +21,9 @@ export interface CanvasActions {
 }
 
 /**
- * 应用状态接口
+ * Gallery状态接口
  */
-interface AppState {
+interface GalleryState {
   // 选中的节点
   selectedNode: Layer | null
   setSelectedNode: (node: Layer | null) => void
@@ -59,7 +63,7 @@ const initialState = {
 /**
  * Zustand Store
  */
-export const useAppStore = create<AppState>((set) => ({
+export const useGalleryStore = create<GalleryState>((set) => ({
   ...initialState,
 
   // 设置选中的节点
@@ -86,11 +90,11 @@ export const useAppStore = create<AppState>((set) => ({
  */
 
 // 获取选中的节点
-export const useSelectedNode = () => useAppStore((state) => state.selectedNode)
+export const useSelectedNode = () => useGalleryStore((state) => state.selectedNode)
 
 // 获取侧边栏状态
 export const useSidebarState = () =>
-  useAppStore((state) => ({
+  useGalleryStore((state) => ({
     isOpen: state.isSidebarOpen,
     open: state.openSidebar,
     close: state.closeSidebar,
@@ -99,7 +103,8 @@ export const useSidebarState = () =>
 
 // 获取画布交互状态
 export const useCanvasInteractive = () =>
-  useAppStore((state) => state.isCanvasInteractive)
+  useGalleryStore((state) => state.isCanvasInteractive)
 
 // 获取缩放级别
-export const useZoomLevel = () => useAppStore((state) => state.zoomLevel)
+export const useZoomLevel = () => useGalleryStore((state) => state.zoomLevel)
+

@@ -15,10 +15,10 @@
 import { useCallback, useMemo, useState, useRef } from "react"
 import { X, Plus, Trash2, Edit2, GripVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getLayerIcon, getFieldLabel, getNodeTypeName, getLayerParams } from "@/lib/fieldMapping"
+import { getLayerIcon, getFieldLabel, getNodeTypeName, getLayerParams } from "@/lib/utils"
 import { getLayerColorTheme } from "@/lib/theme"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
-import { createNodeByType, getAvailableNodeTypes } from "@/lib/sandbox/nodeFactory"
+import { useSandboxStore } from "@/lib/sandboxStore"
+import { createNodeByType, getAvailableNodeTypes } from "@/lib/nodeFactory"
 import type { Layer, LayerType, SequentialLayer, ParallelLayer, ParallelBranch } from "@/lib/types"
 
 /**
@@ -90,7 +90,7 @@ export function PropertyPanel({ className = "" }: PropertyPanelProps) {
   }, [selectedNodeIds, layers])
 
   const theme = selectedNode ? getLayerColorTheme(selectedNode) : null
-  const Icon = selectedNode ? getLayerIcon(selectedNode.type) : null
+  const Icon = selectedNode ? getLayerIcon(selectedNode) : null
 
   // 更新节点属性（用于onBlur，失去焦点时更新）
   const handleFieldChange = useCallback(
@@ -1137,7 +1137,7 @@ function ChildNodeItem({
 }: ChildNodeItemProps) {
   const params = getLayerParams(layer).filter(p => p.label !== "描述") // 排除description
   const layerTheme = getLayerColorTheme(layer)
-  const Icon = getLayerIcon(layer.type)
+  const Icon = getLayerIcon(layer)
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
@@ -1382,18 +1382,41 @@ function SequentialParallelEditor({
         <div className="text-xs text-muted-foreground mb-2">
           顺序模块包含的子节点列表（按顺序执行）
         </div>
+        <div className="space-y-2">
+          {steps.length > 0 ? (
+            steps.map((step: Layer, index: number) => (
+              <ChildNodeItem
+                key={step.id || index}
+                layer={step}
+                index={index}
+                onRemove={() => onRemoveSequentialStep(index)}
+                onDragStart={handleSequentialDragStart(index)}
+                onDragOver={handleSequentialDragOver(index)}
+                onDragLeave={handleSequentialDragLeave}
+                onDrop={handleSequentialDrop(index)}
+                onUpdate={(updates) => onUpdateSequentialStep(index, updates)}
+                isDragging={draggedIndex === index}
+                isDragOver={dragOverIndex === index}
+              />
+            ))
+          ) : (
+            <div className="text-xs text-muted-foreground p-2 border border-dashed border-border rounded-md text-center">
+              暂无子节点，点击"添加子节点"开始
+            </div>
+          )}
+        </div>
         {showNodeTypeSelector !== -1 ? (
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowNodeTypeSelector(-1)}
-            className="w-full gap-1 h-7 text-xs mb-2"
+            className="w-full gap-1 h-7 text-xs mt-2"
           >
             <Plus className="h-3 w-3" />
             添加子节点
           </Button>
         ) : (
-          <div className="mb-2 p-2 border border-border rounded-md bg-muted/30">
+          <div className="mt-2 p-2 border border-border rounded-md bg-muted/30">
             <div className="text-xs font-medium mb-2">选择节点类型：</div>
             <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
               {availableNodeTypes.map((type) => (
@@ -1418,29 +1441,6 @@ function SequentialParallelEditor({
             </Button>
           </div>
         )}
-        <div className="space-y-2">
-          {steps.length > 0 ? (
-            steps.map((step: Layer, index: number) => (
-              <ChildNodeItem
-                key={step.id || index}
-                layer={step}
-                index={index}
-                onRemove={() => onRemoveSequentialStep(index)}
-                onDragStart={handleSequentialDragStart(index)}
-                onDragOver={handleSequentialDragOver(index)}
-                onDragLeave={handleSequentialDragLeave}
-                onDrop={handleSequentialDrop(index)}
-                onUpdate={(updates) => onUpdateSequentialStep(index, updates)}
-                isDragging={draggedIndex === index}
-                isDragOver={dragOverIndex === index}
-              />
-            ))
-          ) : (
-            <div className="text-xs text-muted-foreground p-2 border border-dashed border-border rounded-md text-center">
-              暂无子节点，点击"添加子节点"开始
-            </div>
-          )}
-        </div>
       </div>
     )
   }

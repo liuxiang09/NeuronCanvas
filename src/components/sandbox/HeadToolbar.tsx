@@ -1,5 +1,5 @@
 /**
- * Toolbar - 操作工具栏
+ * HeadToolbar - 操作工具栏
  * 
  * 功能说明：
  * - 提供sandbox编辑器的顶部工具栏
@@ -19,18 +19,17 @@ import {
   Save,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
-import { useAppStore } from "@/lib/store"
+import { useSandboxStore } from "@/lib/sandboxStore"
 
-interface ToolbarProps {
+interface HeadToolbarProps {
   className?: string
 }
 
 /**
- * Toolbar - 操作工具栏
+ * HeadToolbar - 操作工具栏
  * 顶部工具栏，包含清空画布、自动布局、导入/导出等操作
  */
-export function Toolbar({ className = "" }: ToolbarProps) {
+export function HeadToolbar({ className = "" }: HeadToolbarProps) {
   const layers = useSandboxStore((state) => state.layers)
   const edges = useSandboxStore((state) => state.edges)
   const clearModel = useSandboxStore((state) => state.clearModel)
@@ -39,7 +38,7 @@ export function Toolbar({ className = "" }: ToolbarProps) {
   const openExportDialog = useSandboxStore((state) => state.openExportDialog)
   const saveToStorage = useSandboxStore((state) => state.saveToStorage)
   const needsSave = useSandboxStore((state) => state.needsSave)
-  const canvasActionsRef = useAppStore((state) => state.canvasActionsRef)
+  const canvasActionsRef = useSandboxStore((state) => state.canvasActionsRef)
 
   // 清空画布
   const handleClear = useCallback(() => {

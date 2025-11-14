@@ -1,8 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
-import { useAppStore } from "@/lib/store"
+import { useSandboxStore } from "@/lib/sandboxStore"
 
 /**
  * Sandbox专用快捷键处理
@@ -20,7 +19,13 @@ export function useSandboxShortcuts() {
   const layers = useSandboxStore((state) => state.layers)
   const closeContextMenu = useSandboxStore((state) => state.closeContextMenu)
   const contextMenu = useSandboxStore((state) => state.contextMenu)
-  const canvasActionsRef = useAppStore((state) => state.canvasActionsRef)
+  const canvasActionsRef = useSandboxStore((state) => state.canvasActionsRef)
+  const copyToClipboard = useSandboxStore((state) => state.copyToClipboard)
+  const clipboard = useSandboxStore((state) => state.clipboard)
+  const undo = useSandboxStore((state) => state.undo)
+  const redo = useSandboxStore((state) => state.redo)
+  const canUndo = useSandboxStore((state) => state.canUndo)
+  const canRedo = useSandboxStore((state) => state.canRedo)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -120,6 +125,61 @@ export function useSandboxShortcuts() {
         return
       }
 
+      // Ctrl+C / Cmd+C: 复制选中的节点
+      if (ctrlKey && key === "c" && selectedNodeIds.length > 0) {
+        event.preventDefault()
+        const nodeId = selectedNodeIds[0] // 复制第一个选中的节点
+        const node = layers.find((layer) => layer.id === nodeId)
+        if (node) {
+          copyToClipboard(node)
+        }
+        return
+      }
+
+      // Ctrl+V / Cmd+V: 粘贴节点（使用与右键菜单相同的逻辑）
+      if (ctrlKey && key === "v" && clipboard) {
+        event.preventDefault()
+        
+        // 使用最后一次鼠标点击的位置，如果没有则使用视图中心位置
+        const lastClickPosition = useSandboxStore.getState().lastClickPosition
+        let flowPosition: { x: number; y: number }
+        
+        if (lastClickPosition) {
+          // 使用保存的最后一次点击位置
+          flowPosition = lastClickPosition
+        } else {
+          // 如果没有保存的位置，使用视图中心位置
+          const screenCenter = {
+            x: typeof window !== "undefined" ? window.innerWidth / 2 : 400,
+            y: typeof window !== "undefined" ? window.innerHeight / 2 : 300,
+          }
+          flowPosition = canvasActionsRef.current?.screenToFlowPosition?.(screenCenter) || { x: 400, y: 300 }
+        }
+        
+        // 使用与右键菜单相同的粘贴逻辑
+        const pasteNodeAtPosition = useSandboxStore.getState().pasteNodeAtPosition
+        pasteNodeAtPosition(flowPosition)
+        return
+      }
+
+      // Ctrl+Z / Cmd+Z: 撤销
+      if (ctrlKey && key === "z" && !event.shiftKey) {
+        event.preventDefault()
+        if (canUndo()) {
+          undo()
+        }
+        return
+      }
+
+      // Ctrl+Y / Cmd+Y 或 Ctrl+Shift+Z / Cmd+Shift+Z: 重做
+      if ((ctrlKey && key === "y") || (ctrlKey && key === "z" && event.shiftKey)) {
+        event.preventDefault()
+        if (canRedo()) {
+          redo()
+        }
+        return
+      }
+
       // 画布缩放快捷键（复用canvas快捷键）
       // + 或 =: 放大画布
       if (key === "=" || key === "+") {
@@ -154,10 +214,16 @@ export function useSandboxShortcuts() {
     openImportDialog,
     openExportDialog,
     clearModel,
-    layers.length,
+    layers,
     contextMenu.isOpen,
     closeContextMenu,
     canvasActionsRef,
+    copyToClipboard,
+    clipboard,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   ])
 }
 

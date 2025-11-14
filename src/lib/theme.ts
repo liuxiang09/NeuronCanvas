@@ -151,20 +151,13 @@ export function getLayerColorTheme(layer: Layer): LayerColorTheme {
     const customColor = layer.color as string;
     const customConfig: LayerColorConfig = {
       color: customColor,
+      colorEnd: customColor,
       shade: 500,
       shadeEnd: 600,
     };
 
-    if (customColor === "emerald") {
-      customConfig.colorEnd = "teal";
-    }
-
     return generateColorTheme(customConfig);
   }
 
-  const config = LAYER_COLOR_CONFIGS[layer.type] || {
-    color: "gray",
-    shade: 500,
-  };
-  return generateColorTheme(config);
+  return generateColorTheme(LAYER_COLOR_CONFIGS[layer.type] || { color: "gray", shade: 500 });
 }

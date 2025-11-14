@@ -12,10 +12,10 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import { getLayerIcon, getNodeTypeName } from "@/lib/fieldMapping"
+import { getLayerIcon, getNodeTypeName } from "@/lib/utils"
 import { getLayerColorTheme } from "@/lib/theme"
-import { createNodeByType } from "@/lib/sandbox/nodeFactory"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
+import { createNodeByType } from "@/lib/nodeFactory"
+import { useSandboxStore } from "@/lib/sandboxStore"
 import type { LayerType, Layer } from "@/lib/types"
 import { ChevronDown, ChevronRight } from "lucide-react"
 
@@ -151,15 +151,15 @@ export function NodeToolbar({ className = "" }: NodeToolbarProps) {
                 {isExpanded && (
                   <div className="p-2 space-y-1">
                     {category.types.map((type) => {
-                      const NodeIcon = getLayerIcon(type)
                       const isDragging = draggedType === type
                       
-                      // 获取节点类型的颜色主题
+                      // 创建模拟 Layer 对象用于获取图标和主题
                       const mockLayer: Layer = {
                         id: "",
                         name: "",
                         type: type,
                       } as Layer
+                      const NodeIcon = getLayerIcon(mockLayer)
                       const theme = getLayerColorTheme(mockLayer)
 
                       return (

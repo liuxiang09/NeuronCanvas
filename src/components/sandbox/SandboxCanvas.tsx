@@ -31,13 +31,12 @@ import ReactFlow, {
 import "reactflow/dist/style.css"
 import { Info, ZoomIn, ZoomOut, Maximize2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useAppStore } from "@/lib/store"
-import { useSandboxStore } from "@/lib/sandbox/sandboxStore"
-import { nodeComponents } from "@/components/canvas/custom-nodes"
-import { edgeComponents } from "@/components/canvas/custom-edges"
+import { useSandboxStore } from "@/lib/sandboxStore"
+import { nodeComponents } from "@/components/gallery/custom-nodes"
+import { edgeComponents } from "@/components/gallery/custom-edges"
 import { getLayerColorTheme } from "@/lib/theme"
 import { calculateLayout, getNodeTypeMap } from "@/lib/layout"
-import { createNodeByType } from "@/lib/sandbox/nodeFactory"
+import { createNodeByType } from "@/lib/nodeFactory"
 import type { Layer, LayerType } from "@/lib/types"
 
 interface SandboxCanvasProps {
@@ -67,12 +66,13 @@ function SandboxCanvasInner({ className = "" }: SandboxCanvasProps) {
   const clearNodePositions = useSandboxStore((state) => state.clearNodePositions)
   const showConfirmDialog = useSandboxStore((state) => state.showConfirmDialog)
   const openContextMenu = useSandboxStore((state) => state.openContextMenu)
+  const closeContextMenu = useSandboxStore((state) => state.closeContextMenu)
+  const setLastClickPosition = useSandboxStore((state) => state.setLastClickPosition)
 
-  // 全局状态
-  const setZoomLevel = useAppStore((state) => state.setZoomLevel)
-  const zoomLevel = useAppStore((state) => state.zoomLevel)
-  const canvasActionsRef = useAppStore((state) => state.canvasActionsRef)
-  const isSidebarOpen = useAppStore((state) => state.isSidebarOpen)
+  // 画布状态
+  const setZoomLevel = useSandboxStore((state) => state.setZoomLevel)
+  const zoomLevel = useSandboxStore((state) => state.zoomLevel)
+  const canvasActionsRef = useSandboxStore((state) => state.canvasActionsRef)
   
   // 右侧属性面板宽度（用于计算浮动面板位置）
   const rightSidebarWidth = useSandboxStore((state) => state.rightSidebarWidth)
@@ -236,8 +236,10 @@ function SandboxCanvasInner({ className = "" }: SandboxCanvasProps) {
       zoomOut: handleZoomOut,
       fitView: handleFitView,
       autoLayout: handleAutoLayout,
+      screenToFlowPosition: screenToFlowPosition,
+      getViewport: getViewport,
     }
-  }, [handleZoomIn, handleZoomOut, handleFitView, handleAutoLayout, canvasActionsRef])
+  }, [handleZoomIn, handleZoomOut, handleFitView, handleAutoLayout, screenToFlowPosition, getViewport, canvasActionsRef])
 
   useEffect(() => {
     const viewport = getViewport?.()
@@ -300,9 +302,20 @@ function SandboxCanvasInner({ className = "" }: SandboxCanvasProps) {
   )
 
   // 点击空白区域处理
-  const handlePaneClick = useCallback(() => {
-    setSelectedNodeIds([])
-  }, [setSelectedNodeIds])
+  const handlePaneClick = useCallback(
+    (event: React.MouseEvent) => {
+      setSelectedNodeIds([])
+      closeContextMenu()
+      
+      // 保存鼠标点击位置（画布坐标）
+      const flowPosition = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      })
+      setLastClickPosition(flowPosition)
+    },
+    [setSelectedNodeIds, closeContextMenu, screenToFlowPosition, setLastClickPosition]
+  )
 
   // 节点删除处理（带确认）
   const handleNodesDelete = useCallback(
